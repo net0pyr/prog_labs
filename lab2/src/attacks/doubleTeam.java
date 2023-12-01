@@ -1,4 +1,4 @@
-package Attacks;
+package attacks;
 
 import ru.ifmo.se.pokemon.Pokemon;
 import ru.ifmo.se.pokemon.Stat;

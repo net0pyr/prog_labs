@@ -1,15 +1,15 @@
 import ru.ifmo.se.pokemon.*;
-import Pokemons.*;
+import pokemons.*;
 
 public class Main {
     public static void main(String[] args) {
         Battle b = new Battle();
-        Pokemon p1 = new Chingling("Колокольчик", 1);
-        Pokemon p2 = new Chimecho("Ленточный червь", 1);
-        Pokemon p3 = new Illumise("Коромыслоголовый", 1);
-        Pokemon p4 = new Ralts("Эмо", 1);
-        Pokemon p5 = new Kirlia("Балерина", 1);
-        Pokemon p6 = new Gallade("Галетина", 1);
+        Pokemon p1 = new chingling("Колокольчик", 1);
+        Pokemon p2 = new chimecho("Ленточный червь", 1);
+        Pokemon p3 = new illumise("Коромыслоголовый", 1);
+        Pokemon p4 = new ralts("Эмо", 1);
+        Pokemon p5 = new kirlia("Балерина", 1);
+        Pokemon p6 = new gallade("Галетина", 1);
         b.addAlly(p3);
         b.addAlly(p1);
         b.addAlly(p2);

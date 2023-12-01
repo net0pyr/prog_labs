@@ -1,6 +1,6 @@
-package Pokemons;
+package pokemons;
 
-import Attacks.*;
+import attacks.*;
 
 public class kirlia extends ralts {
     public kirlia(String name, int level) {

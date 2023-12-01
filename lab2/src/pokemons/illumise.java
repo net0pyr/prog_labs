@@ -1,7 +1,7 @@
-package Pokemons;
+package pokemons;
 
 import ru.ifmo.se.pokemon.*;
-import Attacks.*;
+import attacks.*;
 
 public class illumise extends Pokemon {
     public illumise(String name, int level) {

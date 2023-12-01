@@ -1,6 +1,6 @@
-package Pokemons;
+package pokemons;
 
-import Attacks.*;
+import attacks.*;
 import ru.ifmo.se.pokemon.*;
 
 public class gallade extends kirlia {

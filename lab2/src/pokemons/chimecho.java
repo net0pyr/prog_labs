@@ -1,7 +1,7 @@
-package Pokemons;
+package pokemons;
 
 import ru.ifmo.se.pokemon.*;
-import Attacks.*;
+import attacks.*;
 
 public class chimecho extends Pokemon {
     public chimecho(String name, int level) {
