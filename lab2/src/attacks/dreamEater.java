@@ -2,19 +2,19 @@ package Attacks;
 
 import ru.ifmo.se.pokemon.*;
 
-public class Dream_Eater extends SpecialMove {
-    public Dream_Eater() {
+public class dreamEater extends SpecialMove {
+    public dreamEater() {
         super(Type.PSYCHIC,100,100);
     }
-    private boolean f = false;
+    private boolean isSleep = false;
     public void applyOppDamage(Pokemon p, double x) {
         if(p.getCondition()==Status.SLEEP) {
-            f = true;
+            isSleep = true;
             p.setMod(Stat.HP, (int)(Math.round(x)));
         }
     }
     public void applySelfEffects(Pokemon p) {
-        if(f) {
+        if(isSleep) {
             p.setMod(Stat.HP, - (int)((12-p.getHP())/2));
         }
     }

@@ -1,8 +1,8 @@
 package Attacks;
 
 import ru.ifmo.se.pokemon.*;
-public class Flatter extends StatusMove {
-    public Flatter() {
+public class flatter extends StatusMove {
+    public flatter() {
         super(Type.DARK, 0, 100);
     }
     public void applyOppEffects(Pokemon p) {

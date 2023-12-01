@@ -2,8 +2,8 @@ package Attacks;
 
 import ru.ifmo.se.pokemon.*;
 
-public class Hypnosis extends StatusMove {
-    public Hypnosis() {
+public class hypnosis extends StatusMove {
+    public hypnosis() {
         super(Type.PSYCHIC, 0, 60);
     }
     public void applyOppEffects(Pokemon p) {

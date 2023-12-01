@@ -2,8 +2,8 @@ package Attacks;
 
 import ru.ifmo.se.pokemon.*;
 
-public class Quick_Attack extends PhysicalMove {
-    public Quick_Attack() {
+public class quickAttack extends PhysicalMove {
+    public quickAttack() {
         super(Type.NORMAL,40,100);
     }
     public String describe() {

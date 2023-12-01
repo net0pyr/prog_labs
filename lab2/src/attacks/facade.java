@@ -2,8 +2,8 @@ package Attacks;
 
 import ru.ifmo.se.pokemon.*;
 
-public class Facade extends PhysicalMove {
-    public Facade() {
+public class facade extends PhysicalMove {
+    public facade() {
         super(Type.NORMAL,70,100);
     }
     public void applyOppDamage(Pokemon p, double x) {

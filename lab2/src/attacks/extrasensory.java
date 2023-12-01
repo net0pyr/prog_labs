@@ -2,8 +2,8 @@ package Attacks;
 
 import ru.ifmo.se.pokemon.*;
 
-public class Extrasensory extends SpecialMove {
-    public Extrasensory() {
+public class extrasensory extends SpecialMove {
+    public extrasensory() {
         super(Type.PSYCHIC, 80, 100);
     }
     public void applyOppEffects(Pokemon p) {

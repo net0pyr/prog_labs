@@ -5,8 +5,8 @@ import ru.ifmo.se.pokemon.Stat;
 import ru.ifmo.se.pokemon.StatusMove;
 import ru.ifmo.se.pokemon.Type;
 
-public class Double_Team extends StatusMove {
-    public Double_Team() {
+public class doubleTeam extends StatusMove {
+    public doubleTeam() {
         super(Type.NORMAL,0,100);
     }
     public void applySelfEffects(Pokemon p) {

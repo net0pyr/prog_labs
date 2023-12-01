@@ -2,8 +2,8 @@ package Attacks;
 
 import ru.ifmo.se.pokemon.*;
 
-public class Rest extends StatusMove {
-    public Rest() {
+public class rest extends StatusMove {
+    public rest() {
         super(Type.PSYCHIC, 0, 100);
     }
     public void applySelfEffects(Pokemon p) {

@@ -2,8 +2,8 @@ package Attacks;
 
 import ru.ifmo.se.pokemon.*;
 
-public class Recover extends StatusMove {
-    public Recover() {
+public class recover extends StatusMove {
+    public recover() {
         super(Type.NORMAL, 0, 100);
     }
     public void applySelfEffects(Pokemon p) {

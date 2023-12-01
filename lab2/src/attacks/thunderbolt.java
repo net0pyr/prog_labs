@@ -2,8 +2,8 @@ package Attacks;
 
 import ru.ifmo.se.pokemon.*;
 
-public class Thunderbolt extends SpecialMove {
-    public Thunderbolt() {
+public class thunderbolt extends SpecialMove {
+    public thunderbolt() {
         super(Type.ELECTRIC,90,100);
     }
     public void applyOppEffects(Pokemon p) {

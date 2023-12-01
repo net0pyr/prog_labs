@@ -2,8 +2,8 @@ package Attacks;
 
 import ru.ifmo.se.pokemon.*;
 
-public class Magical_Leaf extends SpecialMove {
-    public Magical_Leaf() {
+public class magicalLeaf extends SpecialMove {
+    public magicalLeaf() {
         super(Type.GRASS, 60, 100);
     }
     public void applyOppDamage (Pokemon p, double x) {

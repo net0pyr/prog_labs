@@ -2,8 +2,8 @@ package Attacks;
 
 import ru.ifmo.se.pokemon.*;
 
-public class Confuse_Ray extends StatusMove {
-    public Confuse_Ray() {
+public class confuseRay extends StatusMove {
+    public confuseRay() {
         super(Type.GHOST, 0,100);
     }
     public void applyOppEffects(Pokemon p) {
