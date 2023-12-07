@@ -1,7 +1,7 @@
 public enum Moves {
-    tweak("подстроил"),
-    force("заставил"),
-    want("хочет");
+    TWEAK("подстроил"),
+    FORCE("заставил"),
+    WANT("хочет");
     private String title;
     Moves (String title) {
         this.title = title;
