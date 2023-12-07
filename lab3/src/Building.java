@@ -1,5 +1,3 @@
-import java.nio.MappedByteBuffer;
-
 public class Building implements Disappearing{
     private String name;
     private String appearance;
