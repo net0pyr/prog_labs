@@ -3,6 +3,7 @@ public enum Moves {
     FORCE("заставил"),
     WANT("хочет");
     private String title;
+
     Moves (String title) {
         this.title = title;
     }
