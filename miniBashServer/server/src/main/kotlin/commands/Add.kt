@@ -16,19 +16,19 @@ class Add : CommandExample() {
      * @param commandArgument аргумент команды
      */
     override fun <T> commandExecution(commandArgument: T): String? {
-        if (commandArgument != null && commandArgument != "") {
-            return "\u001B[31mКоманда add не имеет таких аргуметов.\u001B[0m\nВоспользуйтесь командой help, чтобы получить дополнительную информацию"
+        return if (commandArgument != null && commandArgument != "") {
+            "\u001B[31mКоманда add не имеет таких аргуметов.\u001B[0m\nВоспользуйтесь командой help, чтобы получить дополнительную информацию"
         } else {
             try {
                 val spaceMarine = CommandHandler.spaceMarine
                 if (spaceMarine != null) {
                     SpaceMarineInTreeSet.spaceMarines.add(spaceMarine)
-                    return "Элемент успешно добавлен"
+                    "Элемент успешно добавлен"
                 } else {
-                    return null
+                    null
                 }
             } catch (e: InputMismatchException) {
-                return "\u001B[31mОшибка:\u001B[0m Неверный формат ввода"
+                "\u001B[31mОшибка:\u001B[0m Неверный формат ввода"
             }
         }
     }

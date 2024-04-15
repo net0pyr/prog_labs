@@ -117,6 +117,12 @@ class SpaceMarine(
     fun getMeleeWeapon(): String {
         return meleeWeapon!!.weaponName
     }
+    fun getHealth(): Double? {
+        return health
+    }
+    fun getHeight(): Int? {
+        return height
+    }
 
     override fun toString(): String {
         return "Имя: $name, id: $id"

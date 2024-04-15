@@ -17,8 +17,8 @@ class History : CommandExample() {
      * @param commandArgument аргумент команды
      */
     override fun <T> commandExecution(commandArgument: T): String? {
-        if (commandArgument != null && commandArgument != "") {
-            return "\u001B[31mКоманда history не имеет таких аргуметов.\u001B[0m\nВоспользуйтесь командой help, чтобы получить дополнительную информацию"
+        return if (commandArgument != null && commandArgument != "") {
+            "\u001B[31mКоманда history не имеет таких аргуметов.\u001B[0m\nВоспользуйтесь командой help, чтобы получить дополнительную информацию"
         } else {
             var linesCount = 0
             val outputString = StringBuilder()
@@ -30,9 +30,9 @@ class History : CommandExample() {
                 linesCount++
             }
             if (history.size == 1) {
-                return "История пустая"
+                "История пустая"
             } else {
-                return outputString.toString()
+                outputString.toString()
             }
         }
     }

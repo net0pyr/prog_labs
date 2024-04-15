@@ -14,17 +14,17 @@ class Show : CommandExample() {
      * @param commandArgument аргумент команды
      */
     override fun <T> commandExecution(commandArgument: T): String? {
-        if (commandArgument != null && commandArgument != "") {
-            return "\u001B[31mКоманда show не имеет таких аргуметов.\u001B[0m\nВоспользуйтесь командой help, чтобы получить дополнительную информацию"
+        return if (commandArgument != null && commandArgument != "") {
+            "\u001B[31mКоманда show не имеет таких аргуметов.\u001B[0m\nВоспользуйтесь командой help, чтобы получить дополнительную информацию"
         } else {
             val outputString = StringBuilder()
             SpaceMarineInTreeSet.spaceMarines.asSequence().sortedBy { it.getName() }.forEach {
-                outputString.append(it.toString()+"\n")
+                outputString.append(it.toString() + "\n")
             }
             if (SpaceMarineInTreeSet.spaceMarines.isEmpty()) {
-                return "Коллекция пустая"
+                "Коллекция пустая"
             } else {
-                return outputString.toString()
+                outputString.toString()
             }
         }
     }

@@ -16,15 +16,15 @@ class Print_field_descending_melee_weapon : CommandExample() {
      * @param commandArgument аргумент команды
      */
     override fun <T> commandExecution(commandArgument: T): String? {
-        if (commandArgument != null && commandArgument != "") {
-            return "\u001B[31mКоманда print_field_descending_melee_weapon не имеет таких аргуметов.\u001B[0m\nВоспользуйтесь командой help, чтобы получить дополнительную информацию"
+        return if (commandArgument != null && commandArgument != "") {
+            "\u001B[31mКоманда print_field_descending_melee_weapon не имеет таких аргуметов.\u001B[0m\nВоспользуйтесь командой help, чтобы получить дополнительную информацию"
         } else {
             val descendingIterator = SpaceMarineInTreeSet.spaceMarines.descendingIterator()
             val outputString = StringBuilder()
             while (descendingIterator.hasNext()) {
                 outputString.append(descendingIterator.next().getMeleeWeapon()+"\n")
             }
-            return outputString.toString()
+            outputString.toString()
         }
     }
 }

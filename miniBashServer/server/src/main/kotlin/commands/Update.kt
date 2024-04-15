@@ -17,7 +17,7 @@ class Update : CommandExample() {
      */
     override fun <T> commandExecution(commandArgument: T): String? {
         val id: Long?
-        try {
+        return try {
             id = commandArgument?.toString()?.toLong()
             try {
                 val changingSpaceMarine = SpaceMarineInTreeSet.spaceMarines.find { it.getId() == id }
@@ -30,17 +30,17 @@ class Update : CommandExample() {
                     if (spaceMarine != null) {
                         SpaceMarineInTreeSet.spaceMarines.add(spaceMarine)
                     }
-                    return "Элемент успешно обновлен"
+                    "Элемент успешно обновлен"
                 } catch (e: InputMismatchException) {
-                    return "\u001B[31mОшибка:\u001B[0m Неверный формат ввода"
+                    "\u001B[31mОшибка:\u001B[0m Неверный формат ввода"
                 }
             } catch (e: NoSuchElementException) {
-                return "\u001B[31mОшибка:\u001B[0m Не существует десантника с таким id"
+                "\u001B[31mОшибка:\u001B[0m Не существует десантника с таким id"
             } catch (e: NullPointerException) {
-                return "\u001B[31mОшибка:\u001B[0m Не существует десантника с таким id"
+                "\u001B[31mОшибка:\u001B[0m Не существует десантника с таким id"
             }
         } catch (e: NumberFormatException) {
-            return "\u001B[31mКоманда update не имеет таких аргуметов.\u001B[0m\nВоспользуйтесь командой help, чтобы получить дополнительную информацию"
+            "\u001B[31mКоманда update не имеет таких аргуметов.\u001B[0m\nВоспользуйтесь командой help, чтобы получить дополнительную информацию"
         }
     }
 }

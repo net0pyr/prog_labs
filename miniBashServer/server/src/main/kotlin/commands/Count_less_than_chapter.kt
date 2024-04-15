@@ -17,8 +17,8 @@ class Count_less_than_chapter : CommandExample() {
      * @param commandArgument аргумент команды
      */
     override fun <T> commandExecution(commandArgument: T): String? {
-        if (commandArgument != null && commandArgument != "") {
-            return "\u001B[31mКоманда count_less_than_chapter не имеет таких аргуметов.\u001B[0m\nВоспользуйтесь командой help, чтобы получить дополнительную информацию"
+        return if (commandArgument != null && commandArgument != "") {
+            "\u001B[31mКоманда count_less_than_chapter не имеет таких аргуметов.\u001B[0m\nВоспользуйтесь командой help, чтобы получить дополнительную информацию"
         } else {
             try {
                 val chapter = CommandHandler.chapter
@@ -30,10 +30,10 @@ class Count_less_than_chapter : CommandExample() {
                         }
                     }
                 }
-                return "$count"
+                "$count"
 
             } catch (e: InputMismatchException) {
-                return "\u001B[31mОшибка:\u001B[0m Неверный формат ввода"
+                "\u001B[31mОшибка:\u001B[0m Неверный формат ввода"
             }
         }
     }

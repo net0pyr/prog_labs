@@ -16,8 +16,8 @@ class Filter_contains_name : CommandExample() {
      * @param commandArgument аргумент команды
      */
     override fun <T> commandExecution(commandArgument: T): String? {
-        if (commandArgument == null || commandArgument == "") {
-            return "\u001B[31mКоманда filter_contains_name не имеет таких аргуметов.\u001B[0m\nВоспользуйтесь командой help, чтобы получить дополнительную информацию"
+        return if (commandArgument == null || commandArgument == "") {
+            "\u001B[31mКоманда filter_contains_name не имеет таких аргуметов.\u001B[0m\nВоспользуйтесь командой help, чтобы получить дополнительную информацию"
         } else {
             var findFlag = false
             val outputString = StringBuilder()
@@ -28,9 +28,9 @@ class Filter_contains_name : CommandExample() {
                 }
             }
             if (!findFlag) {
-                return "Совпадений не найдено"
+                "Совпадений не найдено"
             } else {
-                return outputString.toString()
+                outputString.toString()
             }
         }
     }

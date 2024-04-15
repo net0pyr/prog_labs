@@ -15,12 +15,12 @@ class Info : CommandExample() {
      * @param commandArgument аргумент команды
      */
     override fun <T> commandExecution(commandArgument: T): String? {
-        if (commandArgument != null && commandArgument != "") {
-            return "\u001B[31mКоманда info не имеет таких аргуметов.\u001B[0m\nВоспользуйтесь командой help, чтобы получить дополнительную информацию"
+        return if (commandArgument != null && commandArgument != "") {
+            "\u001B[31mКоманда info не имеет таких аргуметов.\u001B[0m\nВоспользуйтесь командой help, чтобы получить дополнительную информацию"
         } else {
             val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
             val formattedDateTime = SpaceMarineInTreeSet.creationTime.format(formatter)
-            return "Тип коллекции: TreeSet\nДата инициализации: $formattedDateTime\nКоличество элементов: ${SpaceMarineInTreeSet.spaceMarines.size}"
+            "Тип коллекции: TreeSet\nДата инициализации: $formattedDateTime\nКоличество элементов: ${SpaceMarineInTreeSet.spaceMarines.size}"
         }
     }
 }
