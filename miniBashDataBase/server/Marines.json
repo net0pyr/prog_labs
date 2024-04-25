@@ -1,0 +1,4 @@
+[
+{"name":"тарантино","coordinates":{"x":123.0,"y":123.0},"health":13.0,"height":15,"category":"SCOUT","meleeWeapon":"CHAIN_SWORD","chapter":{"name":"qwe","parentLegion":"qwe","marineCount":123,"world":"qwe"},"id":887629125,"creationDate":"2024-04-15T09:35:21.926798156"},
+{"name":"джон вик","coordinates":{"x":123.0,"y":123.0},"health":20.0,"height":40,"category":"SCOUT","meleeWeapon":"CHAIN_SWORD","chapter":{"name":"qwe","parentLegion":"qwe","marineCount":123,"world":"qwe"},"id":941107750,"creationDate":"2024-04-15T09:35:21.926955534"}
+]
