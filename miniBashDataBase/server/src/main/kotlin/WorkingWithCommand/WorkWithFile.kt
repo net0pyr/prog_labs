@@ -7,6 +7,8 @@ import java.io.BufferedReader
 import java.io.FileInputStream
 import java.io.FileWriter
 import java.io.InputStreamReader
+import java.util.concurrent.locks.ReentrantLock
+import java.util.concurrent.locks.ReentrantReadWriteLock
 
 /**
  * Класс описывает работу с фалом
@@ -14,36 +16,45 @@ import java.io.InputStreamReader
  */
 class WorkWithFile() {
 
+    companion object {
+        val lock = ReentrantReadWriteLock()
+    }
+
     /** Метод записи нового десантника в файл
      * @param spaceMarine новый десантник
      */
     fun writingToFile(spaceMarine: SpaceMarine) {
-        val inputStreamReader = InputStreamReader(FileInputStream(System.getenv("FILE_PATH")))
-        val reader = BufferedReader(inputStreamReader)
-        var fileArray = mutableListOf<String>()
-        var line: String?
-        var existFlag = false
-        while (reader.readLine().also { line = it } != null) {
-            fileArray.add(line!!)
-            if (line != "]" && line != "" && line != "[") existFlag = true
-        }
-        for (i in fileArray.size - 1 downTo 0) {
-            if (fileArray[i] == "]")
-                break;
+        lock.writeLock().lock()
+        try {
+            val inputStreamReader = InputStreamReader(FileInputStream(System.getenv("FILE_PATH")))
+            val reader = BufferedReader(inputStreamReader)
+            var fileArray = mutableListOf<String>()
+            var line: String?
+            var existFlag = false
+            while (reader.readLine().also { line = it } != null) {
+                fileArray.add(line!!)
+                if (line != "]" && line != "" && line != "[") existFlag = true
+            }
+            for (i in fileArray.size - 1 downTo 0) {
+                if (fileArray[i] == "]")
+                    break;
+                fileArray.removeLast()
+            }
             fileArray.removeLast()
+            if (existFlag) {
+                fileArray[fileArray.size - 1] += ","
+            }
+            val jsonString = Json.encodeToString(spaceMarine)
+            fileArray.add(jsonString)
+            fileArray.add("]")
+            val writer = FileWriter(System.getenv("FILE_PATH"))
+            fileArray.forEach {
+                writer.write("$it\n")
+            }
+            writer.close()
+        } finally {
+            lock.writeLock().unlock()
         }
-        fileArray.removeLast()
-        if (existFlag) {
-            fileArray[fileArray.size - 1] += ","
-        }
-        val jsonString = Json.encodeToString(spaceMarine)
-        fileArray.add(jsonString)
-        fileArray.add("]")
-        val writer = FileWriter(System.getenv("FILE_PATH"))
-        fileArray.forEach {
-            writer.write("$it\n")
-        }
-        writer.close()
     }
 
     /** Метод удаления десантника по его id

@@ -9,6 +9,7 @@ import java.nio.ByteBuffer
 import java.nio.channels.SelectionKey
 import java.nio.channels.Selector
 import java.nio.channels.SocketChannel
+import java.security.MessageDigest
 import java.util.*
 
 class Client {
@@ -18,6 +19,7 @@ class Client {
     private val buffer = ByteBuffer.allocate(4096)
     private var isConnected = false
     private var isFirst = true
+    private var isLogin = false
     fun start(scanner: Scanner) {
         val clientChannel = SocketChannel.open()
         clientChannel.configureBlocking(false)
@@ -54,9 +56,7 @@ class Client {
 
             readFromServer(clientChannel, scanner)
 
-            if (scanner.hasNextLine()) {
-                readLine(scanner, clientChannel)
-            }
+            readLine(scanner, clientChannel)
         }
     }
 
@@ -83,12 +83,15 @@ class Client {
             val data = ByteArray(buffer.remaining())
             buffer.get(data)
             val message = String(data)
-
+            if(message == "Аккаунт успешно добавлен. Можете воспользоваться командой help, чтобы ознакомиться с командами."||
+                message == "Вход успешно выполнен") {
+                isLogin = true
+            }
             println(message)
             if (isConnected && CommandHandler.executeScriptFlag) {
                 readLine(scanner, clientChannel)
             } else {
-                if (isConnected && scanner.hasNextLine()) {
+                if (isConnected) {
                     readLine(scanner, clientChannel)
                 }
             }
@@ -98,15 +101,43 @@ class Client {
     private fun readLine(scanner: Scanner, clientChannel: SocketChannel) {
         lateinit var outputString: String
         if (!CommandHandler.executeScriptFlag) {
-            val inputString = scanner.nextLine()
             val commandHandler = CommandHandler()
-            if (inputString == "exit") {
-                println("Отключение от сервера")
-                clientChannel.close()
-                isConnected = false
-                return
+            if(isLogin) {
+                val inputString = scanner.nextLine()
+                if (inputString == "exit") {
+                    println("Отключение от сервера")
+                    clientChannel.close()
+                    isConnected = false
+                    return
+                }
+                outputString = commandHandler.execute(inputString)
+            } else {
+                println("У Вас есть аккаунт(1-да, 2-нет):")
+                val typeOfLogin: String = scanner.nextLine()
+                when(typeOfLogin) {
+                    "1" -> {
+                        println("Логин:")
+                        val login = scanner.nextLine()
+                        println("Пароль:")
+                        val password = scanner.nextLine()
+                        outputString = "1:${login}:${sha256(password)}"
+                    }
+                    "2" ->  {
+                        println("Придумайте логин:")
+                        val login = scanner.nextLine()
+                        println("Придумайте пароль:")
+                        val password = scanner.nextLine()
+                        println("Повторите пароль:")
+                        val repeatPassword = scanner.nextLine()
+                        if(password != repeatPassword) {
+                            println("Ошибка создания аккаунта. Пароли не совпадают")
+                        } else {
+                            outputString = "2:${login}:${sha256(password)}"
+                        }
+                    }
+                    else -> println("Неверный формат ввода")
+                }
             }
-            outputString = commandHandler.execute(inputString)
         }
         if (CommandHandler.executeScriptFlag || outputString == "executeScript") {
             val index = ExecuteScript.index
@@ -128,5 +159,12 @@ class Client {
         val chapter = inputString.split("\n")[1]
         CommandHandler.commandWithSpaceMarine += spaceMarine.split(' ')
         CommandHandler.commandWithChapter += chapter.split(' ')
+    }
+
+    private fun sha256(input: String): String {
+        val bytes = input.toByteArray()
+        val digest = MessageDigest.getInstance("SHA-256")
+        val hashBytes = digest.digest(bytes)
+        return hashBytes.joinToString("") { "%02x".format(it) }
     }
 }

@@ -20,6 +20,7 @@ class Server {
 
     companion object {
         val logger: Logger? = LogManager.getLogger(Server::class.java)
+        private val dataBase = DataBase()
     }
 
     fun start() {
@@ -86,11 +87,31 @@ class Server {
         val inputString = String(data)
         logger?.info("Получен новый запрос: {}", inputString)
 
-        val commandHandler = CommandHandler()
-        val outputString = commandHandler.execute(inputString).trimEnd('\n')
-        CommandHandler.spaceMarine = null
-        CommandHandler.chapter = null
+        lateinit var outputString: String
 
+        when (inputString[0]) {
+            '1' -> {
+                val login = inputString.split(":")[1]
+                val password = inputString.split(":")[2]
+                if(dataBase.login(login, password)) {
+                    outputString = "Вход успешно выполнен"
+                } else {
+                    outputString = "Неверный логин или пароль"
+                }
+            }
+            '2' -> {
+                val login = inputString.split(":")[1]
+                val password = inputString.split(":")[2]
+                dataBase.addAccount(login, password)
+                outputString = "Аккаунт успешно добавлен. Можете воспользоваться командой help, чтобы ознакомиться с командами."
+            }
+            else -> {
+                val commandHandler = CommandHandler()
+                outputString = commandHandler.execute(inputString).trimEnd('\n')
+                CommandHandler.spaceMarine = null
+                CommandHandler.chapter = null
+            }
+        }
         logger?.info("Отправлен ответ: {}", outputString)
         val outputBuffer = ByteBuffer.wrap(outputString.toByteArray())
         clientChannel.write(outputBuffer)

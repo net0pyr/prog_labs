@@ -6,6 +6,7 @@ import java.io.FileInputStream
 import java.io.InputStreamReader
 import java.time.LocalDateTime
 import java.util.*
+import java.util.concurrent.locks.ReentrantReadWriteLock
 
 /**
  * Класс описывающий коллекцию в которой хранятся десантники
@@ -21,14 +22,19 @@ class SpaceMarineInTreeSet {
     }
 
     /** Метод заполнения коллекции */
-    fun fill() {
-        creationTime = LocalDateTime.now()
-        val inputStreamReader = InputStreamReader(FileInputStream(System.getenv("FILE_PATH")))
-        val reader = BufferedReader(inputStreamReader)
-        val jsonString = reader.use { it.readText() }
-        val spaceMarinesInFile = Json.decodeFromString<List<SpaceMarine>>(jsonString)
-        spaceMarinesInFile.forEach {
-            spaceMarines.add(it)
+    fun fill(lock: ReentrantReadWriteLock) {
+        lock.readLock().lock()
+        try {
+            creationTime = LocalDateTime.now()
+            val inputStreamReader = InputStreamReader(FileInputStream(System.getenv("FILE_PATH")))
+            val reader = BufferedReader(inputStreamReader)
+            val jsonString = reader.use { it.readText() }
+            val spaceMarinesInFile = Json.decodeFromString<List<SpaceMarine>>(jsonString)
+            spaceMarinesInFile.forEach {
+                spaceMarines.add(it)
+            }
+        } finally {
+            lock.readLock().unlock()
         }
     }
 }

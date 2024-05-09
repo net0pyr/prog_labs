@@ -34,7 +34,7 @@ project(":server") {
         implementation("com.jcraft:jsch:0.1.55")
         //implementation("com.squareup.sqldelight:jdbc-driver:1.5.5")
         implementation("org.postgresql:postgresql:42.7.3")
-        runtimeOnly ("org.flywaydb:flyway-gradle-plugin:9.16.1")
+        implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.8.1-Beta")
     }
     tasks.named<JavaExec>("run") {
         standardInput = System.`in`
