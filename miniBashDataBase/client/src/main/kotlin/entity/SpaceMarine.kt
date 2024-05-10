@@ -122,7 +122,7 @@ class SpaceMarine(
     }
 
     override fun toString(): String {
-        return "Имя: $name, id: $id"
+        return "Имя - $name, id - $id"
     }
 
     override fun equals(other: Any?): Boolean {

@@ -12,7 +12,7 @@ class CommandHandler {
         val commandWithChapter = mutableListOf<String>()
     }
 
-    fun execute(inputString: String): String {
+    fun execute(inputString: String, id: Int): String {
         var commandArgument = ""
         val input = inputString.trim(' ').split(' ')
         val inputCommand = input[0]
@@ -23,20 +23,20 @@ class CommandHandler {
         if (commandWithSpaceMarine.contains(inputCommand)) {
             val readNewObject = ReadNewObject()
             val spaceMarine = readNewObject.readNewMarine()
-            val command = Command(inputCommand, spaceMarine, commandArgument)
+            val command = Command(inputCommand, spaceMarine, commandArgument, id)
             outputString = Json.encodeToString(command)
         } else if (commandWithChapter.contains(inputCommand)) {
             val readNewObject = ReadNewObject()
             val chapter = readNewObject.readNewChapter()
-            val command = Command(inputCommand, chapter, commandArgument)
+            val command = Command(inputCommand, chapter, commandArgument, id)
             outputString = Json.encodeToString(command)
         } else if (inputCommand == "execute_script") {
             executeScriptFlag = true
             val executeScript = ExecuteScript()
-            executeScript.commandExecution(commandArgument)
+            executeScript.commandExecution(commandArgument, id)
             outputString = "executeScript"
         } else {
-            val command = Command(inputCommand, commandArgument)
+            val command = Command(inputCommand, commandArgument, id)
             outputString = Json.encodeToString(command)
         }
         return outputString

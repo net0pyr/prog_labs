@@ -12,7 +12,7 @@ import kotlinx.serialization.Serializable
  * @author net0pyr
  */
 @Serializable
-class Chapter(
+data class Chapter(
     private var name: String?,
     private var parentLegion: String? = null,
     private var marineCount: Int?,
@@ -44,6 +44,19 @@ class Chapter(
         } catch (e: MyIllegalArgumentException) {
             println("Ошибка: ${e.message}")
         }
+    }
+
+    fun getName(): String? {
+        return name
+    }
+    fun getLegion(): String? {
+        return parentLegion
+    }
+    fun getMarinesCount(): Int? {
+        return marineCount
+    }
+    fun getWorld(): String? {
+        return world
     }
 
     /** Метод переопределяющий компоратор

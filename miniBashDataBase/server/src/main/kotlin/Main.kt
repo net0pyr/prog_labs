@@ -11,11 +11,11 @@ fun main() {
     Class.forName("org.postgresql.Driver");
     val spaceMarineInTreeSet = SpaceMarineInTreeSet()
     val lock = ReentrantReadWriteLock()
-    spaceMarineInTreeSet.fill(lock)
 //    val inputStreamReader = InputStreamReader(FileInputStream("Marines.json"))
 //    val reader = BufferedReader(inputStreamReader)
 //    val jsonString = reader.use { it.readText() }
 //    println(jsonString)
     val server = Server()
+    Server.dataBase.fill(lock)
     server.start()
 }

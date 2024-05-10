@@ -25,5 +25,10 @@ class Coordinates(private var x: Float?, private var y: Double?) {
             println("Ошибка: ${e.message}")
         }
     }
-
+    fun getX(): Float? {
+        return x
+    }
+    fun getY(): Double? {
+        return y
+    }
 }

@@ -2,10 +2,16 @@ package com.net0pyr
 
 import com.jcraft.jsch.JSch
 import com.jcraft.jsch.Session
-import java.sql.Connection
-import java.sql.DriverManager
-import java.sql.PreparedStatement
-import java.sql.ResultSet
+import com.net0pyr.army.Chapter
+import com.net0pyr.entity.SpaceMarine
+import com.net0pyr.entity.SpaceMarineInTreeSet
+import com.net0pyr.enums.AstartesCategory
+import com.net0pyr.enums.MeleeWeapon
+import com.net0pyr.location.Coordinates
+import java.sql.*
+import java.time.LocalDateTime
+import java.util.*
+import java.util.concurrent.locks.ReentrantReadWriteLock
 
 class DataBase {
     companion object {
@@ -27,17 +33,17 @@ class DataBase {
         val databaseUser = "s408674"
         val databasePassword = "JqiD08XJqxZ0CiaR"
 
-        val localPort = 5432 // локальный порт для туннелирования
+        val localPort = 5432
 
         try {
             session = jsch.getSession(user, host, 2222)
-            session.setConfig("PreferredAuthentications", "publickey");
+            session.setConfig("PreferredAuthentications", "publickey")
             jsch.setKnownHosts("~/.ssh/known_hosts")
             jsch.addIdentity(privateKey)
-            session.setConfig("StrictHostKeyChecking", "no");
+            session.setConfig("StrictHostKeyChecking", "no")
             session.connect()
 
-            session.setPortForwardingL(localPort, databaseHost, 5432) // указываем стандартный порт для PostgreSQL
+            session.setPortForwardingL(localPort, databaseHost, 5432)
 
             System.setProperty("jdbc.url", jdbcURL)
             System.setProperty("jdbc.user", databaseUser)
@@ -45,27 +51,15 @@ class DataBase {
             Class.forName("org.postgresql.Driver")
 
             connection = DriverManager.getConnection(jdbcURL, databaseUser, databasePassword)
-//
-//
-//            val statement = connection.createStatement()
-//            val resultSet = statement.executeQuery("SELECT * FROM account")
-//
-//            while (resultSet.next()) {
-//                println(resultSet)
-//            }
-//
-//            resultSet.close()
-//            statement.close()
-//            connection.close()
 
-            //session.disconnect()
         } catch (e: Exception) {
             e.printStackTrace()
         }
     }
 
-    fun addAccount(login: String, password: String) {
-        val preparedStatement: PreparedStatement = connection.prepareStatement("INSERT INTO account (login, password) VALUES (?, ?)")
+    fun addAccount(login: String, password: String): Int {
+        val preparedStatement: PreparedStatement =
+            connection.prepareStatement("INSERT INTO account (login, password) VALUES (?, ?)")
 
         preparedStatement.setString(1, login)
         preparedStatement.setString(2, password)
@@ -80,10 +74,12 @@ class DataBase {
 
         preparedStatement.close()
         //connection.close()
+
+        return login(login, password)
     }
 
-    fun login(login: String, password: String): Boolean {
-        val query = "SELECT COUNT(*) FROM account WHERE login = ? AND password = ?"
+    fun login(login: String, password: String): Int {
+        val query = "SELECT id FROM account WHERE login = ? AND password = ?"
 
         val preparedStatement: PreparedStatement = connection.prepareStatement(query)
         preparedStatement.setString(1, login)
@@ -91,16 +87,218 @@ class DataBase {
 
         val resultSet: ResultSet = preparedStatement.executeQuery()
 
-        resultSet.next()
-        val count = resultSet.getInt(1)
+        var id = -1
+
+        if (resultSet.next()) {
+            id = resultSet.getInt("id")
+        }
 
         preparedStatement.close()
         //connection.close()
 
-        return if (count > 0) {
-            true
-        } else {
-            false
+        return id
+    }
+
+    fun fill(lock: ReentrantReadWriteLock) {
+        lock.readLock().lock()
+        try {
+            SpaceMarineInTreeSet.creationTime = LocalDateTime.now()
+            val query =
+                "SELECT space_marine.id as id, space_marine.name as name, space_marine.coordinates as coordinates, health, height, category, " +
+                        "meleeWeapon, chapter, chapter.name as chapter_name, parent_legion, marines_count, world, x, y FROM space_marine " +
+                        "LEFT JOIN chapter on chapter.id = space_marine.chapter " +
+                        "LEFT JOIN coordinates on coordinates.id = space_marine.coordinates; "
+            val preparedStatement: PreparedStatement = connection.prepareStatement(query)
+            val resultSet: ResultSet = preparedStatement.executeQuery()
+
+            SpaceMarineInTreeSet.spaceMarines.clear()
+
+            while (resultSet.next()) {
+                val coordinates = Coordinates(resultSet.getFloat("x"), resultSet.getDouble("y"))
+                val chapter = Chapter(
+                    resultSet.getString("chapter_name"), resultSet.getString("parent_legion"),
+                    resultSet.getInt("marines_count"), resultSet.getString("world")
+                )
+                val spaceMarine = SpaceMarine(
+                    resultSet.getString("name"),
+                    coordinates,
+                    resultSet.getDouble("health"),
+                    resultSet.getInt("height"),
+                    AstartesCategory.valueOf(resultSet.getString("category").uppercase(Locale.getDefault()).replace(' ','_')),
+                    MeleeWeapon.valueOf(resultSet.getString("meleeweapon").uppercase().replace(' ','_')),
+                    chapter
+                )
+                SpaceMarineInTreeSet.spaceMarines.add(spaceMarine)
+            }
+
+            resultSet.close()
+            preparedStatement.close()
+        } finally {
+            lock.readLock().unlock()
         }
+    }
+
+    fun getCreatorSpaceMarine(id: Long): Int {
+        val query = "SELECT creator FROM space_marine WHERE id = ?"
+
+        val preparedStatement: PreparedStatement = connection.prepareStatement(query)
+        preparedStatement.setInt(1, id.toInt())
+
+        val resultSet: ResultSet = preparedStatement.executeQuery()
+
+        var creator = -1
+
+        if (resultSet.next()) {
+            creator = resultSet.getInt("id")
+        }
+
+        preparedStatement.close()
+        //connection.close()
+
+        return creator
+    }
+
+    fun addChapter(chapter: Chapter, creator: Int): Int {
+        val query = "INSERT INTO chapter (name, parent_legion, marines_count, world, creator) VALUES (?, ?, ?, ?, ?)"
+        val preparedStatement: PreparedStatement = connection.prepareStatement(query, Statement.RETURN_GENERATED_KEYS)
+
+        preparedStatement.setString(1, chapter.getName())
+        preparedStatement.setString(2, chapter.getLegion())
+        chapter.getMarinesCount()?.let { preparedStatement.setInt(3, it) }
+        preparedStatement.setString(4, chapter.getWorld())
+        preparedStatement.setInt(5, creator)
+
+        preparedStatement.executeUpdate()
+
+        val generatedKeys = preparedStatement.generatedKeys
+        var chapterId = -1
+        if (generatedKeys.next()) {
+            chapterId = generatedKeys.getInt(1)
+        }
+        preparedStatement.close()
+        return chapterId
+    }
+
+    fun addCoordinates(coordinates: Coordinates, creator: Int): Int {
+        val query = "INSERT INTO coordinates (x, y, creator) VALUES (?, ?, ?)"
+        val preparedStatement: PreparedStatement = connection.prepareStatement(query, Statement.RETURN_GENERATED_KEYS)
+
+        coordinates.getX()?.let { preparedStatement.setFloat(1, it) }
+        coordinates.getY()?.let { preparedStatement.setDouble(2, it) }
+        preparedStatement.setInt(3, creator)
+
+        preparedStatement.executeUpdate()
+
+        val generatedKeys = preparedStatement.generatedKeys
+        var coordinatesId = -1
+        if (generatedKeys.next()) {
+            coordinatesId = generatedKeys.getInt(1)
+        }
+
+        preparedStatement.close()
+        return coordinatesId
+    }
+
+    fun add(spaceMarine: SpaceMarine, creator: Int): Long {
+        val coordinatesId = spaceMarine.getCoordinates()?.let { addCoordinates(it, creator) }
+        val chapterId = spaceMarine.getChapter()?.let { addChapter(it, creator) }
+
+        val query =
+            "INSERT INTO space_marine (name, coordinates, health, height, category, meleeweapon, chapter, creator) " +
+                    "VALUES (?, ?, ?, ?, CAST(? AS astrates_category), CAST(? AS melle_weapon), ?, ?)"
+
+        val preparedStatement: PreparedStatement = connection.prepareStatement(query, Statement.RETURN_GENERATED_KEYS)
+        preparedStatement.setString(1, spaceMarine.getName())
+        if (coordinatesId != null) {
+            preparedStatement.setInt(2, coordinatesId)
+        }
+        spaceMarine.getHealth()?.let { preparedStatement.setDouble(3, it) }
+        spaceMarine.getHeight()?.let { preparedStatement.setInt(4, it) }
+        println(spaceMarine.getCategory())
+        preparedStatement.setString(5, spaceMarine.getCategory())
+        preparedStatement.setString(6, spaceMarine.getMeleeWeapon())
+        if (chapterId != null) {
+            preparedStatement.setInt(7, chapterId)
+        }
+        preparedStatement.setInt(8, creator)
+
+        preparedStatement.executeUpdate()
+
+        val generatedKeys = preparedStatement.generatedKeys
+        var id: Long = -1
+        if (generatedKeys.next()) {
+            id = generatedKeys.getLong(1)
+        }
+        preparedStatement.close()
+        return id
+    }
+
+    fun updateSpaceMarine(spaceMarine: SpaceMarine, creator: Int) {
+
+
+        val coordinatesId = spaceMarine.getCoordinates()?.let { addCoordinates(it, creator) }
+        val chapterId = spaceMarine.getChapter()?.let { addChapter(it, creator) }
+
+        val query =
+            "UPDATE space_marine SET name = ?, coordinates = ?, health = ?, height = ?, category = ?, meleeweapon = ?, chapter = ? WHERE id = ?"
+        val preparedStatement: PreparedStatement = connection.prepareStatement(query)
+
+        preparedStatement.setString(1, spaceMarine.getName())
+        if (coordinatesId != null) {
+            preparedStatement.setInt(2, coordinatesId)
+        }
+        spaceMarine.getHealth()?.let { preparedStatement.setDouble(3, it) }
+        spaceMarine.getHeight()?.let { preparedStatement.setInt(4, it) }
+        preparedStatement.setString(5, spaceMarine.getCategory())
+        preparedStatement.setString(6, spaceMarine.getMeleeWeapon())
+        preparedStatement.setString(7, chapterId.toString())
+        preparedStatement.setInt(8, spaceMarine.getId().toInt())
+
+        preparedStatement.executeUpdate()
+
+        preparedStatement.close()
+    }
+
+    fun deleteSpaceMarine(spaceMarine: SpaceMarine) {
+        deleteChapterAndCoordinates(spaceMarine)
+        val query = "DELETE FROM space_marine WHERE id = ?"
+        val preparedStatement: PreparedStatement = connection.prepareStatement(query)
+
+        preparedStatement.setInt(1, spaceMarine.getId().toInt())
+
+        preparedStatement.executeUpdate()
+
+        preparedStatement.close()
+    }
+
+    fun deleteChapterAndCoordinates(spaceMarine: SpaceMarine) {
+        var query = "SELECT chapter, coordinates FROM space_marine WHERE id = ?"
+        var preparedStatement: PreparedStatement = connection.prepareStatement(query)
+        preparedStatement.setInt(1, spaceMarine.getId().toInt())
+        val resultSet: ResultSet = preparedStatement.executeQuery()
+        var chapterId: Int? = null
+        var coordinatesId: Int? = null
+        if (resultSet.next()) {
+            chapterId = resultSet.getInt("chapter")
+            coordinatesId = resultSet.getInt("coordinates")
+        }
+
+        preparedStatement.close()
+        query = "DELETE FROM coordinates WHERE id = ?"
+        preparedStatement = connection.prepareStatement(query)
+        if (coordinatesId != null) {
+            preparedStatement.setInt(1, coordinatesId)
+        }
+        preparedStatement.executeUpdate()
+        preparedStatement.close()
+
+        query = "DELETE FROM chapter WHERE id = ?"
+        preparedStatement = connection.prepareStatement(query)
+        if (chapterId != null) {
+            preparedStatement.setInt(1, chapterId)
+        }
+        preparedStatement.executeUpdate()
+        preparedStatement.close()
+
     }
 }

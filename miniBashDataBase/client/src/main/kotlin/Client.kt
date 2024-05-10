@@ -20,6 +20,7 @@ class Client {
     private var isConnected = false
     private var isFirst = true
     private var isLogin = false
+    private var id = -1
     fun start(scanner: Scanner) {
         val clientChannel = SocketChannel.open()
         clientChannel.configureBlocking(false)
@@ -82,10 +83,11 @@ class Client {
             buffer.flip()
             val data = ByteArray(buffer.remaining())
             buffer.get(data)
-            val message = String(data)
+            val message = String(data).split(":")[0]
             if(message == "Аккаунт успешно добавлен. Можете воспользоваться командой help, чтобы ознакомиться с командами."||
                 message == "Вход успешно выполнен") {
                 isLogin = true
+                id = String(data).split(":")[1].toInt()
             }
             println(message)
             if (isConnected && CommandHandler.executeScriptFlag) {
@@ -110,7 +112,7 @@ class Client {
                     isConnected = false
                     return
                 }
-                outputString = commandHandler.execute(inputString)
+                outputString = commandHandler.execute(inputString, id)
             } else {
                 println("У Вас есть аккаунт(1-да, 2-нет):")
                 val typeOfLogin: String = scanner.nextLine()

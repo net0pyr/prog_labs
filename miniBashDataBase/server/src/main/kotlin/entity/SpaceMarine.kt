@@ -6,7 +6,6 @@ import com.net0pyr.location.*
 import com.net0pyr.army.*
 import com.net0pyr.exceptions.MyIllegalArgumentException
 import kotlinx.serialization.Serializable
-import kotlin.math.abs
 
 /**
  * Класс описывает космических десантников
@@ -36,7 +35,6 @@ class SpaceMarine(
     private val creationDate: LocalDateTime = LocalDateTime.now()
 
     init {
-        id = abs(creationDate.toString().hashCode()).toLong()
         fun checkHealth(health: Double?) {
             if (health == null) {
                 throw MyIllegalArgumentException("Пехотинец прошел жестокую подготовку и был воспитан войном. Его здоровье не может быть нулевым.")
@@ -124,8 +122,14 @@ class SpaceMarine(
         return height
     }
 
+    fun getCoordinates(): Coordinates? {
+        return coordinates
+    }
+    fun getCategory(): String {
+        return category!!.categoryName
+    }
     override fun toString(): String {
-        return "Имя: $name, id: $id"
+        return "Имя - $name, id - $id"
     }
 
     override fun equals(other: Any?): Boolean {

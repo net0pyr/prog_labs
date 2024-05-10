@@ -10,8 +10,6 @@ import java.io.FileWriter
 
 class CommandHandler {
     companion object {
-        var spaceMarine: SpaceMarine? = null
-        var chapter: Chapter? = null
         var commands: HashMap<String, CommandExample> = HashMap()
     }
 
@@ -36,10 +34,11 @@ class CommandHandler {
         lateinit var outputString: String
         val command = Json.decodeFromString<Command>(inputString)
         val commandInMap = commands.get(command.getName())
-        spaceMarine = command.getSpaceMarine()
-        chapter = command.getChapter()
+        val spaceMarine = command.getSpaceMarine()
+        val chapter = command.getChapter()
+        val id = command.getId()
         if (commandInMap != null) {
-            outputString = commandInMap.commandExecution(command.getCommandArgument()).toString()
+            outputString = commandInMap.commandExecution(command.getCommandArgument(),spaceMarine,chapter,id).toString()
         } else {
             outputString = "Нет такой команды, воспользуйтесь командой help, чтобы посмотреть доступные команды."
         }

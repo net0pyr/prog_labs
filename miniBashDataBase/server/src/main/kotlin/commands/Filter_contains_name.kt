@@ -1,5 +1,7 @@
 package com.net0pyr.commands
 
+import com.net0pyr.army.Chapter
+import com.net0pyr.entity.SpaceMarine
 import com.net0pyr.entity.SpaceMarineInTreeSet
 
 
@@ -10,12 +12,17 @@ import com.net0pyr.entity.SpaceMarineInTreeSet
 class Filter_contains_name : CommandExample() {
     /**Поле описания команды*/
     override val commandDescription =
-        "filter_contains_name name: вывести элементы, значения поля name которых содержит заданную подстроку"
+        "filter_contains_name name - вывести элементы, значения поля name которых содержит заданную подстроку"
 
     /** Метод исполнения команды
      * @param commandArgument аргумент команды
      */
-    override fun <T> commandExecution(commandArgument: T): String? {
+    override fun <T> commandExecution(
+        commandArgument: T,
+        spaceMarine: SpaceMarine?,
+        chapter: Chapter?,
+        id: Int
+    ): String? {
         return if (commandArgument == null || commandArgument == "") {
             "\u001B[31mКоманда filter_contains_name не имеет таких аргуметов.\u001B[0m\nВоспользуйтесь командой help, чтобы получить дополнительную информацию"
         } else {

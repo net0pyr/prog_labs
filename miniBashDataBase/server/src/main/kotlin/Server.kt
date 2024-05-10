@@ -1,11 +1,8 @@
 package com.net0pyr
 
 import com.net0pyr.WorkingWithCommand.CommandHandler
-import com.net0pyr.commands.Save
 import org.apache.logging.log4j.LogManager
 import org.apache.logging.log4j.Logger
-import java.io.BufferedReader
-import java.io.InputStreamReader
 import java.net.InetSocketAddress
 import java.nio.ByteBuffer
 import java.nio.channels.SelectionKey
@@ -13,14 +10,18 @@ import java.nio.channels.Selector
 import java.nio.channels.ServerSocketChannel
 import java.nio.channels.SocketChannel
 import java.util.*
+import java.util.concurrent.Executors
 
 class Server {
     private val port = 12345
     private val selector = Selector.open()
+    val cacheRead = Executors.newCachedThreadPool()
+    val fixedExecute = Executors.newFixedThreadPool(20)
+    val fixedWrite = Executors.newFixedThreadPool(20)
 
     companion object {
         val logger: Logger? = LogManager.getLogger(Server::class.java)
-        private val dataBase = DataBase()
+        val dataBase = DataBase()
     }
 
     fun start() {
@@ -29,19 +30,19 @@ class Server {
         serverChannel.configureBlocking(false)
         serverChannel.register(selector, SelectionKey.OP_ACCEPT)
         logger?.info("Сервер начал работу")
-        Thread {
-            BufferedReader(InputStreamReader(System.`in`)).use { reader ->
-                while (true) {
-                    if (reader.ready()) {
-                        val line = reader.readLine()
-                        if (line == "save") {
-                            val save = Save()
-                            save.commandExecution(null)
-                        }
-                    }
-                }
-            }
-        }.start()
+//        Thread {
+//            BufferedReader(InputStreamReader(System.`in`)).use { reader ->
+//                while (true) {
+//                    if (reader.ready()) {
+//                        val line = reader.readLine()
+//                        if (line == "save") {
+//                            val save = Save()
+//                            save.commandExecution(null)
+//                        }
+//                    }
+//                }
+//            }
+//        }.start()
 
 
         while (true) {
@@ -53,6 +54,7 @@ class Server {
                     key.isAcceptable -> acceptClient(serverChannel)
                     key.isReadable -> readFromClient(key)
                 }
+                Thread.sleep(50)
                 keys.remove(key)
             }
 
@@ -71,51 +73,125 @@ class Server {
     }
 
     private fun readFromClient(key: SelectionKey) {
+
+        class Writer(private val clientChannel: SocketChannel, private val buffer: ByteBuffer, private val outputString: String) : Runnable {
+            override fun run() {
+                logger?.info("Отправлен ответ: {}", outputString)
+                val outputBuffer = ByteBuffer.wrap(outputString.toByteArray())
+                clientChannel.write(outputBuffer)
+                buffer.clear()
+            }
+        }
+
+        class Executor(private val clientChannel: SocketChannel, private val buffer: ByteBuffer, private val inputString: String) : Runnable {
+            override fun run() {
+                lateinit var outputString: String
+
+                when (inputString[0]) {
+                    '1' -> {
+                        val login = inputString.split(":")[1]
+                        val password = inputString.split(":")[2]
+                        val id = dataBase.login(login, password)
+                        outputString = if (id != -1) {
+                            "Вход успешно выполнен:${id}"
+                        } else {
+                            "Неверный логин или пароль"
+                        }
+                    }
+
+                    '2' -> {
+                        val login = inputString.split(":")[1]
+                        val password = inputString.split(":")[2]
+                        val id = dataBase.addAccount(login, password)
+                        outputString = if (id == -1) {
+                            "Ошибка создания аккаунта"
+                        } else {
+                            "Аккаунт успешно добавлен. Можете воспользоваться командой help, чтобы ознакомиться с командами.:${id}"
+                        }
+                    }
+
+                    else -> {
+                        val commandHandler = CommandHandler()
+                        outputString = commandHandler.execute(inputString).trimEnd('\n')
+                    }
+                }
+                val write = Writer(clientChannel, buffer, outputString)
+                fixedWrite.execute(write)
+            }
+        }
+
+        class Reader(private val clientChannel: SocketChannel, private val buffer: ByteBuffer) : Runnable {
+            override fun run() {
+                val bytesRead = clientChannel.read(buffer)
+
+                if (bytesRead == -1) {
+                    clientChannel.close()
+                    logger?.info("Клиент отключился")
+                    return
+                }
+
+                val data = Arrays.copyOfRange(buffer.array(), 0, bytesRead)
+                val inputString = String(data)
+                logger?.info("Получен новый запрос: {}", inputString)
+                val executor = Executor(clientChannel, buffer, inputString)
+                fixedExecute.execute(executor)
+            }
+        }
+
         val clientChannel = key.channel() as SocketChannel
         val buffer = ByteBuffer.allocate(4096)
-        val bytesRead = clientChannel.read(buffer)
 
-        if (bytesRead == -1) {
-            clientChannel.close()
-            val save = Save()
-            save.commandExecution(null)
-            logger?.info("Клиент отключился")
-            return
-        }
+        val reader = Reader(clientChannel,buffer)
+        cacheRead.execute(reader)
 
-        val data = Arrays.copyOfRange(buffer.array(), 0, bytesRead)
-        val inputString = String(data)
-        logger?.info("Получен новый запрос: {}", inputString)
+//        val clientChannel = key.channel() as SocketChannel
+//        val buffer = ByteBuffer.allocate(4096)
+//        val bytesRead = clientChannel.read(buffer)
+//
+//        if (bytesRead == -1) {
+//            clientChannel.close()
+//            logger?.info("Клиент отключился")
+//            return
+//        }
+//
+//        val data = Arrays.copyOfRange(buffer.array(), 0, bytesRead)
+//        val inputString = String(data)
+//        logger?.info("Получен новый запрос: {}", inputString)
+//        lateinit var outputString: String
+//
+//        when (inputString[0]) {
+//            '1' -> {
+//                val login = inputString.split(":")[1]
+//                val password = inputString.split(":")[2]
+//                val id = dataBase.login(login, password)
+//                outputString = if (id != -1) {
+//                    "Вход успешно выполнен:${id}"
+//                } else {
+//                    "Неверный логин или пароль"
+//                }
+//            }
+//
+//            '2' -> {
+//                val login = inputString.split(":")[1]
+//                val password = inputString.split(":")[2]
+//                val id = dataBase.addAccount(login, password)
+//                outputString = if (id == -1) {
+//                    "Ошибка создания аккаунта"
+//                } else {
+//                    "Аккаунт успешно добавлен. Можете воспользоваться командой help, чтобы ознакомиться с командами.:${id}"
+//                }
+//            }
+//
+//            else -> {
+//                val commandHandler = CommandHandler()
+//                outputString = commandHandler.execute(inputString).trimEnd('\n')
+//            }
+//        }
+//        logger?.info("Отправлен ответ: {}", outputString)
+//        val outputBuffer = ByteBuffer.wrap(outputString.toByteArray())
+//        clientChannel.write(outputBuffer)
+//        buffer.clear()
 
-        lateinit var outputString: String
-
-        when (inputString[0]) {
-            '1' -> {
-                val login = inputString.split(":")[1]
-                val password = inputString.split(":")[2]
-                if(dataBase.login(login, password)) {
-                    outputString = "Вход успешно выполнен"
-                } else {
-                    outputString = "Неверный логин или пароль"
-                }
-            }
-            '2' -> {
-                val login = inputString.split(":")[1]
-                val password = inputString.split(":")[2]
-                dataBase.addAccount(login, password)
-                outputString = "Аккаунт успешно добавлен. Можете воспользоваться командой help, чтобы ознакомиться с командами."
-            }
-            else -> {
-                val commandHandler = CommandHandler()
-                outputString = commandHandler.execute(inputString).trimEnd('\n')
-                CommandHandler.spaceMarine = null
-                CommandHandler.chapter = null
-            }
-        }
-        logger?.info("Отправлен ответ: {}", outputString)
-        val outputBuffer = ByteBuffer.wrap(outputString.toByteArray())
-        clientChannel.write(outputBuffer)
-        buffer.clear()
     }
 
     private fun listsWithData(): ByteArray {

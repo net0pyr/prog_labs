@@ -1,12 +1,12 @@
-CREATE TYPE melle_weapon AS ENUM ('CHAIN_SWORD',
-    'POWER_SWORD',
-    'CHAIN_AXE',
-    'MANREAPER',
-    'POWER_BLADE');
+CREATE TYPE melle_weapon AS ENUM ('Chain sword',
+    'Power sword',
+    'Chain axe',
+    'Manreaper',
+    'Power blade');
 
-CREATE TYPE astrates_category AS ENUM ('SCOUT',
-    'CHAPLAIN',
-    'HELIX');
+CREATE TYPE astrates_category AS ENUM ('Scout',
+    'Chaplain',
+    'Helix');
 
 
 CREATE TABLE chapter

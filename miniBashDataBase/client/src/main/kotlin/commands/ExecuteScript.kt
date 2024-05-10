@@ -16,7 +16,7 @@ class ExecuteScript {
         var index = 0
     }
 
-    fun commandExecution(commandArgument: String?) {
+    fun commandExecution(commandArgument: String?, id: Int) {
         try {
             BufferedReader(InputStreamReader(FileInputStream(commandArgument))).use { reader ->
                 if (stack.contains(commandArgument.toString())) {
@@ -89,7 +89,7 @@ class ExecuteScript {
                         }
                         flagEnd = i + indexArgument + 1
                         val marine = ObjectFromList()
-                        val command = Command(thisLine, marine.getSpaceMarine(argumentArray), "")
+                        val command = Command(thisLine, marine.getSpaceMarine(argumentArray), "", id)
                         commands.add(command)
                     } else if (thisLine.contains("chapter")) {
                         var argumentArray = mutableListOf<String>()
@@ -125,12 +125,12 @@ class ExecuteScript {
                         }
                         flagEnd = i + indexArgument + 1
                         val marine = ObjectFromList()
-                        val command = Command(thisLine, marine.getChapter(argumentArray), "")
+                        val command = Command(thisLine, marine.getChapter(argumentArray), "", id)
                         commands.add(command)
                     } else {
                         val commandHandler = CommandHandler()
-                        commandHandler.execute(thisLine)
-                        commands.add(Json.decodeFromString<Command>(commandHandler.execute(thisLine)))
+                        commandHandler.execute(thisLine, id)
+                        commands.add(Json.decodeFromString<Command>(commandHandler.execute(thisLine, id)))
                     }
                 }
                 stack.remove(commandArgument.toString())
