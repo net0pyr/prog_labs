@@ -33,12 +33,18 @@ class CommandHandler {
     fun execute(inputString: String): String {
         lateinit var outputString: String
         val command = Json.decodeFromString<Command>(inputString)
-        val commandInMap = commands.get(command.getName())
+        val commandInMap = commands[command.getName()]
         val spaceMarine = command.getSpaceMarine()
         val chapter = command.getChapter()
         val id = command.getId()
         if (commandInMap != null) {
             outputString = commandInMap.commandExecution(command.getCommandArgument(),spaceMarine,chapter,id).toString()
+            History.history[id]?.add("${command.getName()} ${command.getCommandArgument()}")
+            if(History.history[id] != null) {
+                if (History.history[id]?.size!! > 6) {
+                    History.history[id]?.removeAt(0)
+                }
+            }
         } else {
             outputString = "Нет такой команды, воспользуйтесь командой help, чтобы посмотреть доступные команды."
         }

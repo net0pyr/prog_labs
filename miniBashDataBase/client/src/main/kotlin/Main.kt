@@ -1,11 +1,19 @@
 package com.net0pyr
 
+import java.nio.channels.ClosedChannelException
 import java.util.*
 
 fun main() {
     Scanner(System.`in`).use { scanner ->
         val client = Client()
-        client.start(scanner)
+        var connectionFlag = false
+        while (!connectionFlag) {
+            try {
+                client.start(scanner)
+                connectionFlag = true
+            } catch (_: ClosedChannelException) {
+            }
+        }
         scanner.close()
     }
 }

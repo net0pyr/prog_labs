@@ -58,6 +58,10 @@ class DataBase {
     }
 
     fun addAccount(login: String, password: String): Int {
+        if(checkLogin(login)) {
+            return -2
+        }
+
         val preparedStatement: PreparedStatement =
             connection.prepareStatement("INSERT INTO account (login, password) VALUES (?, ?)")
 
@@ -76,6 +80,24 @@ class DataBase {
         //connection.close()
 
         return login(login, password)
+    }
+
+    fun checkLogin(login: String): Boolean {
+        val query = "SELECT id FROM account WHERE login = ?"
+
+        val preparedStatement: PreparedStatement = connection.prepareStatement(query)
+        preparedStatement.setString(1, login)
+
+        val resultSet: ResultSet = preparedStatement.executeQuery()
+
+        if (resultSet.next()) {
+            return true
+        }
+
+        preparedStatement.close()
+        //connection.close()
+
+        return false
     }
 
     fun login(login: String, password: String): Int {

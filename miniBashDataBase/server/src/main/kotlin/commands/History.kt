@@ -13,7 +13,7 @@ class History : CommandExample() {
 
     companion object {
         /**Статическое поле хранящее историю команд*/
-        var history = mutableListOf<String>()
+        var history = mutableMapOf<Int,MutableList<String>>()
     }
 
     /** Метод исполнения команды
@@ -29,18 +29,14 @@ class History : CommandExample() {
             "\u001B[31mКоманда history не имеет таких аргуметов.\u001B[0m\nВоспользуйтесь командой help, чтобы получить дополнительную информацию"
         } else {
             var linesCount = 0
-            val outputString = StringBuilder()
-            for (i in maxOf(0, history.size - 7) until History.history.size - 1) {
-                if (linesCount == 6) {
-                    break
-                }
-                outputString.append(History.history[i]+"\n")
-                linesCount++
+            var outputString = ""
+            history[id]?.forEach() {
+                outputString += it+"\n"
             }
-            if (history.size == 1) {
+            if (history[id]?.size == 0) {
                 "История пустая"
             } else {
-                outputString.toString()
+                outputString
             }
         }
     }

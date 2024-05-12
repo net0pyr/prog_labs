@@ -1,6 +1,7 @@
 package com.net0pyr
 
 import com.net0pyr.WorkingWithCommand.CommandHandler
+import com.net0pyr.commands.History
 import org.apache.logging.log4j.LogManager
 import org.apache.logging.log4j.Logger
 import java.net.InetSocketAddress
@@ -105,7 +106,10 @@ class Server {
                         val id = dataBase.addAccount(login, password)
                         outputString = if (id == -1) {
                             "Ошибка создания аккаунта"
-                        } else {
+                        } else if (id == -2) {
+                            "Аккаунт с таким логином уже существует"
+                        }else {
+                            History.history[id] = mutableListOf<String>()
                             "Аккаунт успешно добавлен. Можете воспользоваться командой help, чтобы ознакомиться с командами.:${id}"
                         }
                     }

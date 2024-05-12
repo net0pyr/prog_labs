@@ -4,8 +4,10 @@ import com.net0pyr.WorkingWithCommand.CommandHandler
 import com.net0pyr.commands.ExecuteScript
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
+import java.net.ConnectException
 import java.net.InetSocketAddress
 import java.nio.ByteBuffer
+import java.nio.channels.ClosedChannelException
 import java.nio.channels.SelectionKey
 import java.nio.channels.Selector
 import java.nio.channels.SocketChannel
@@ -38,9 +40,6 @@ class Client {
                     key.isConnectable -> connectToServer(clientChannel, scanner)
                     key.isReadable -> readFromServer(clientChannel, scanner)
                 }
-                if (!isConnected) {
-                    return
-                }
             }
             if (!isConnected) {
                 return
@@ -49,15 +48,21 @@ class Client {
     }
 
     private fun connectToServer(clientChannel: SocketChannel, scanner: Scanner) {
-        if (clientChannel.isConnectionPending) {
-            clientChannel.finishConnect()
+        try {
+            if (clientChannel.isConnectionPending) {
+                clientChannel.finishConnect()
 
-            clientChannel.register(selector, SelectionKey.OP_READ)
-            isConnected = true
+                clientChannel.register(selector, SelectionKey.OP_READ)
+                isConnected = true
 
-            readFromServer(clientChannel, scanner)
+                readFromServer(clientChannel, scanner)
 
-            readLine(scanner, clientChannel)
+                readLine(scanner, clientChannel)
+            }
+        } catch (_: ClosedChannelException) {
+            clientChannel.register(selector, SelectionKey.OP_CONNECT)
+        } catch (_: ConnectException) {
+            clientChannel.register(selector, SelectionKey.OP_CONNECT)
         }
     }
 
