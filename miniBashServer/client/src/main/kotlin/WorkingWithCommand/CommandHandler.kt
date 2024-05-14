@@ -8,48 +8,58 @@ import kotlinx.serialization.json.Json
 class CommandHandler {
     companion object {
         var executeScriptFlag = false
+        var listWithMarine = mutableListOf<String>()
+        var listWithChapter = mutableListOf<String>()
     }
 
     fun execute(inputString: String): String {
-        val inputCommand = StringBuilder("")
-        val commandArgument = StringBuilder("")
-        var argumentFlag = false
-        var commandFlag = false
-        for (letter in inputString) {
-            if (letter != ' ' && !commandFlag) {
-                commandFlag = true
-            }
-            if (letter == ' ' && commandFlag) {
-                argumentFlag = true
-                continue
-            }
-            if (argumentFlag) {
-                commandArgument.append(letter)
-            }
-            if (commandFlag && !argumentFlag) {
-                inputCommand.append(letter)
+        //val inputCommand = StringBuilder("")
+        val listCommand = inputString.trim().split(" ").toList()
+        val inputCommand = listCommand[0]
+        var commandArgument = ""
+        if(listCommand.size>1) {
+            for(i in 1..<listCommand.size) {
+                commandArgument+=listCommand[i]
             }
         }
+        //val commandArgument = StringBuilder("")
+//        var argumentFlag = false
+//        var commandFlag = false
+//        for (letter in inputString) {
+//            if (letter != ' ' && !commandFlag) {
+//                commandFlag = true
+//            }
+//            if (letter == ' ' && commandFlag) {
+//                argumentFlag = true
+//                continue
+//            }
+//            if (argumentFlag) {
+//                commandArgument.append(letter)
+//            }
+//            if (commandFlag && !argumentFlag) {
+//                inputCommand.append(letter)
+//            }
+//        }
         lateinit var outputString: String
-        val commandWithSpaceMarine = listOf("add", "add_if_max", "remove_lower", "update")
-        val commandWithChapter = listOf("count_less_than_chapter")
-        if (commandWithSpaceMarine.contains(inputCommand.toString())) {
+        val commandWithSpaceMarine = listWithMarine.toList()
+        val commandWithChapter = listWithChapter.toList()
+        if (commandWithSpaceMarine.contains(inputCommand)) {
             val readNewObject = ReadNewObject()
             val spaceMarine = readNewObject.readNewMarine()
-            val command = Command(inputString, spaceMarine, commandArgument.toString())
+            val command = Command(inputCommand, spaceMarine, commandArgument)
             outputString = Json.encodeToString(command)
-        } else if (commandWithChapter.contains(inputCommand.toString())) {
+        } else if (commandWithChapter.contains(inputCommand)) {
             val readNewObject = ReadNewObject()
             val chapter = readNewObject.readNewChapter()
-            val command = Command(inputString, chapter, commandArgument.toString())
+            val command = Command(inputCommand, chapter, commandArgument)
             outputString = Json.encodeToString(command)
-        } else if (inputCommand.toString() == "execute_script") {
+        } else if (inputCommand == "execute_script") {
             executeScriptFlag = true
             val executeScript = ExecuteScript()
-            executeScript.commandExecution(commandArgument.toString())
+            executeScript.commandExecution(commandArgument)
             outputString = "executeScript"
         } else {
-            val command = Command(inputString, commandArgument.toString())
+            val command = Command(inputCommand, commandArgument)
             outputString = Json.encodeToString(command)
         }
         return outputString

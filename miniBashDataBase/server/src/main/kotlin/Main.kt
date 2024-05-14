@@ -11,8 +11,6 @@ import java.util.concurrent.locks.ReentrantReadWriteLock
 fun main() {
     Class.forName("org.postgresql.Driver");
     val lock = ReentrantReadWriteLock()
-
-    println(History.history)
 //    val inputStreamReader = InputStreamReader(FileInputStream("Marines.json"))
 //    val reader = BufferedReader(inputStreamReader)
 //    val jsonString = reader.use { it.readText() }

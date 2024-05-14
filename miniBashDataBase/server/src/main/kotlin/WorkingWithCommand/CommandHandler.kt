@@ -1,5 +1,6 @@
 package com.net0pyr.WorkingWithCommand
 
+import com.net0pyr.Server
 import com.net0pyr.army.Chapter
 import com.net0pyr.commands.*
 import com.net0pyr.entity.Command
@@ -40,9 +41,11 @@ class CommandHandler {
         if (commandInMap != null) {
             outputString = commandInMap.commandExecution(command.getCommandArgument(),spaceMarine,chapter,id).toString()
             History.history[id]?.add("${command.getName()} ${command.getCommandArgument()}")
+            Server.dataBase.addInHistory("${command.getName()} ${command.getCommandArgument()}", id)
             if(History.history[id] != null) {
                 if (History.history[id]?.size!! > 6) {
                     History.history[id]?.removeAt(0)
+                    Server.dataBase.deleteFromHistory("${command.getName()} ${command.getCommandArgument()}", id)
                 }
             }
         } else {

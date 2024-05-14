@@ -44,7 +44,6 @@ class Server {
 
 
         while (true) {
-
             selector.select(50)
             val keys = selector.selectedKeys()
             keys.forEach { key ->

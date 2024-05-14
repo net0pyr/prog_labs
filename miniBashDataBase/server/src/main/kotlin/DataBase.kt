@@ -3,6 +3,7 @@ package com.net0pyr
 import com.jcraft.jsch.JSch
 import com.jcraft.jsch.Session
 import com.net0pyr.army.Chapter
+import com.net0pyr.commands.History
 import com.net0pyr.entity.SpaceMarine
 import com.net0pyr.entity.SpaceMarineInTreeSet
 import com.net0pyr.enums.AstartesCategory
@@ -28,25 +29,19 @@ class DataBase {
         val privateKey = "~/.ssh/id_rsa"
         val port = 2222
 
-        val jdbcURL = "jdbc:postgresql://localhost:5432/studs"
-        val databaseHost = "pg"
-        val databaseUser = "s408674"
-        val databasePassword = "JqiD08XJqxZ0CiaR"
-
-        val localPort = 5432
+        val jdbcURL = "jdbc:postgresql://localhost:5432/lab7"
+        val databaseHost = "192.168.10.80"
+        val databaseUser = "net0pyr"
+        val databasePassword = ""
 
         try {
-            session = jsch.getSession(user, host, 2222)
-            session.setConfig("PreferredAuthentications", "publickey")
-            jsch.setKnownHosts("~/.ssh/known_hosts")
-            jsch.addIdentity(privateKey)
-            session.setConfig("StrictHostKeyChecking", "no")
-            session.connect()
-
-            session.setPortForwardingL(localPort, databaseHost, 5432)
-
-            System.setProperty("jdbc.url", jdbcURL)
-            System.setProperty("jdbc.user", databaseUser)
+//            session = jsch.getSession(user, host, port)
+//            session.setConfig("PreferredAuthentications", "publickey")
+//            jsch.setKnownHosts("~/.ssh/known_hosts")
+//            jsch.addIdentity(privateKey)
+//            session.connect()
+//
+//            session.setPortForwardingL(5432, databaseHost, 5432)
 
             Class.forName("org.postgresql.Driver")
 
@@ -56,6 +51,7 @@ class DataBase {
             e.printStackTrace()
         }
     }
+
 
     fun addAccount(login: String, password: String): Int {
         if(checkLogin(login)) {
@@ -94,6 +90,7 @@ class DataBase {
             return true
         }
 
+        resultSet.close()
         preparedStatement.close()
         //connection.close()
 
@@ -115,15 +112,64 @@ class DataBase {
             id = resultSet.getInt("id")
         }
 
+        resultSet.close()
         preparedStatement.close()
         //connection.close()
 
         return id
     }
 
+    fun addInHistory(command:String, id: Int) {
+        val query = "INSERT INTO history (command, creator) VALUES (?, ?)"
+        val preparedStatement: PreparedStatement = connection.prepareStatement(query, Statement.RETURN_GENERATED_KEYS)
+
+        preparedStatement.setString(1, command)
+        preparedStatement.setInt(2, id)
+
+        preparedStatement.executeUpdate()
+
+        preparedStatement.close()
+    }
+
+    fun deleteFromHistory(command:String, id: Int) {
+        val query = "DELETE FROM history WHERE creator = ? AND command = ? LIMIT 1"
+        val preparedStatement: PreparedStatement = connection.prepareStatement(query)
+
+        preparedStatement.setInt(1, id)
+        preparedStatement.setString(2, command)
+
+        preparedStatement.executeUpdate()
+
+        preparedStatement.close()
+    }
+
     fun fill(lock: ReentrantReadWriteLock) {
         lock.readLock().lock()
         try {
+            val queryLogin = "SELECT id FROM account"
+            val preparedStatementLogin: PreparedStatement = connection.prepareStatement(queryLogin)
+            val resultSetLogin: ResultSet = preparedStatementLogin.executeQuery()
+
+            while (resultSetLogin.next()) {
+                History.history[resultSetLogin.getInt("id")]= mutableListOf()
+            }
+
+            resultSetLogin.close()
+            preparedStatementLogin.close()
+
+            val queryHistory = "SELECT * FROM history"
+            val preparedStatementHistory: PreparedStatement = connection.prepareStatement(queryHistory)
+            val resultSetHistory: ResultSet = preparedStatementHistory.executeQuery()
+
+            while (resultSetHistory.next()) {
+                val id = resultSetHistory.getInt("creator")
+                val command = resultSetHistory.getString("command")
+                History.history[id]?.add(command)
+            }
+
+            resultSetLogin.close()
+            preparedStatementLogin.close()
+
             SpaceMarineInTreeSet.creationTime = LocalDateTime.now()
             val query =
                 "SELECT space_marine.id as id, space_marine.name as name, space_marine.coordinates as coordinates, health, height, category, " +
