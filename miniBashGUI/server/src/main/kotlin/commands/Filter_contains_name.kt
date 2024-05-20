@@ -29,7 +29,7 @@ class Filter_contains_name : CommandExample() {
             var findFlag = false
             val outputString = StringBuilder()
             SpaceMarineInTreeSet.spaceMarines.forEach {
-                if (it.getName()?.contains(commandArgument.toString()) == true) {
+                if (it.name?.contains(commandArgument.toString()) == true) {
                     outputString.append(it.toString()+"\n")
                     findFlag = true
                 }

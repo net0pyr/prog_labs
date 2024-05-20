@@ -29,7 +29,7 @@ class Print_field_descending_melee_weapon : CommandExample() {
             val descendingIterator = SpaceMarineInTreeSet.spaceMarines.descendingIterator()
             val outputString = StringBuilder()
             while (descendingIterator.hasNext()) {
-                outputString.append(descendingIterator.next().getMeleeWeapon()+"\n")
+                outputString.append(descendingIterator.next().meleeWeapon.toString()+"\n")
             }
             outputString.toString()
         }

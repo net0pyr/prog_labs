@@ -114,6 +114,10 @@ class Server {
                         }
                     }
 
+                    '0' -> {
+                        outputString = ""
+                    }
+
                     else -> {
                         val commandHandler = CommandHandler()
                         outputString = commandHandler.execute(inputString).trimEnd('\n')

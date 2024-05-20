@@ -27,9 +27,9 @@ class Remove_by_id : CommandExample() {
             idDelete = commandArgument?.toString()?.toLong()
             try {
                 var outputString = ""
-                val changingSpaceMarine = SpaceMarineInTreeSet.spaceMarines.find { it.getId() == idDelete }
+                val changingSpaceMarine = SpaceMarineInTreeSet.spaceMarines.find { it.id == idDelete }
                 if (changingSpaceMarine != null) {
-                    outputString = if (Server.dataBase.getCreatorSpaceMarine(changingSpaceMarine.getId()) == id) {
+                    outputString = if (Server.dataBase.getCreatorSpaceMarine(changingSpaceMarine.id) == id) {
                         SpaceMarineInTreeSet.spaceMarines.remove(changingSpaceMarine)
                         Server.dataBase.deleteSpaceMarine(changingSpaceMarine)
                         "Десантник успешно удален"

@@ -31,7 +31,7 @@ class Count_less_than_chapter : CommandExample() {
                 var count = 0
                 SpaceMarineInTreeSet.spaceMarines.forEach {
                     if (chapter != null) {
-                        if (chapter > it.getChapter()!!) {
+                        if (chapter > it.chapter!!) {
                             count++
                         }
                     }

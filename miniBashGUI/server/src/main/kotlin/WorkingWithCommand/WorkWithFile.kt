@@ -98,7 +98,7 @@ class WorkWithFile() {
         val jsonString = reader.use { it.readText() }
         val spaceMarines = Json.decodeFromString<List<SpaceMarine>>(jsonString)
         spaceMarines.forEach {
-            if (it.getId() == id) {
+            if (it.id == id) {
                 return (it)
             }
         }

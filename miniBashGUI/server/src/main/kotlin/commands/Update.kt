@@ -36,11 +36,11 @@ class Update : CommandExample() {
                         if (spaceMarine != null) {
                             Server.dataBase.updateSpaceMarine(spaceMarine,id)
                         }
-                        var changingSpaceMarine = SpaceMarineInTreeSet.spaceMarines.find { it.getId() == idSpaceMarine }
+                        var changingSpaceMarine = SpaceMarineInTreeSet.spaceMarines.find { it.id == idSpaceMarine }
                         SpaceMarineInTreeSet.spaceMarines.remove(changingSpaceMarine)
                         if (spaceMarine != null) {
                             changingSpaceMarine = spaceMarine
-                            changingSpaceMarine.setId(idSpaceMarine)
+                            changingSpaceMarine.id = (idSpaceMarine)
                             SpaceMarineInTreeSet.spaceMarines.add(changingSpaceMarine)
                         }
                         "Десантник успешно изменен"

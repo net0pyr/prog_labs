@@ -253,23 +253,23 @@ class DataBase {
     }
 
     fun add(spaceMarine: SpaceMarine, creator: Int): Long {
-        val coordinatesId = spaceMarine.getCoordinates()?.let { addCoordinates(it, creator) }
-        val chapterId = spaceMarine.getChapter()?.let { addChapter(it, creator) }
+        val coordinatesId = spaceMarine.coordinates?.let { addCoordinates(it, creator) }
+        val chapterId = spaceMarine.chapter?.let { addChapter(it, creator) }
 
         val query =
             "INSERT INTO space_marine (name, coordinates, health, height, category, meleeweapon, chapter, creator) " +
                     "VALUES (?, ?, ?, ?, CAST(? AS astrates_category), CAST(? AS melle_weapon), ?, ?)"
 
         val preparedStatement: PreparedStatement = connection.prepareStatement(query, Statement.RETURN_GENERATED_KEYS)
-        preparedStatement.setString(1, spaceMarine.getName())
+        preparedStatement.setString(1, spaceMarine.name)
         if (coordinatesId != null) {
             preparedStatement.setInt(2, coordinatesId)
         }
-        spaceMarine.getHealth()?.let { preparedStatement.setDouble(3, it) }
-        spaceMarine.getHeight()?.let { preparedStatement.setInt(4, it) }
-        println(spaceMarine.getCategory())
-        preparedStatement.setString(5, spaceMarine.getCategory())
-        preparedStatement.setString(6, spaceMarine.getMeleeWeapon())
+        spaceMarine.health?.let { preparedStatement.setDouble(3, it) }
+        spaceMarine.height?.let { preparedStatement.setInt(4, it) }
+        println(spaceMarine.category)
+        preparedStatement.setString(5, spaceMarine.category.toString())
+        preparedStatement.setString(6, spaceMarine.meleeWeapon.toString())
         if (chapterId != null) {
             preparedStatement.setInt(7, chapterId)
         }
@@ -289,23 +289,23 @@ class DataBase {
     fun updateSpaceMarine(spaceMarine: SpaceMarine, creator: Int) {
 
 
-        val coordinatesId = spaceMarine.getCoordinates()?.let { addCoordinates(it, creator) }
-        val chapterId = spaceMarine.getChapter()?.let { addChapter(it, creator) }
+        val coordinatesId = spaceMarine.coordinates?.let { addCoordinates(it, creator) }
+        val chapterId = spaceMarine.chapter?.let { addChapter(it, creator) }
 
         val query =
             "UPDATE space_marine SET name = ?, coordinates = ?, health = ?, height = ?, category = ?, meleeweapon = ?, chapter = ? WHERE id = ?"
         val preparedStatement: PreparedStatement = connection.prepareStatement(query)
 
-        preparedStatement.setString(1, spaceMarine.getName())
+        preparedStatement.setString(1, spaceMarine.name)
         if (coordinatesId != null) {
             preparedStatement.setInt(2, coordinatesId)
         }
-        spaceMarine.getHealth()?.let { preparedStatement.setDouble(3, it) }
-        spaceMarine.getHeight()?.let { preparedStatement.setInt(4, it) }
-        preparedStatement.setString(5, spaceMarine.getCategory())
-        preparedStatement.setString(6, spaceMarine.getMeleeWeapon())
+        spaceMarine.health?.let { preparedStatement.setDouble(3, it) }
+        spaceMarine.height?.let { preparedStatement.setInt(4, it) }
+        preparedStatement.setString(5, spaceMarine.category.toString())
+        preparedStatement.setString(6, spaceMarine.meleeWeapon.toString())
         preparedStatement.setString(7, chapterId.toString())
-        preparedStatement.setInt(8, spaceMarine.getId().toInt())
+        preparedStatement.setInt(8, spaceMarine.id.toInt())
 
         preparedStatement.executeUpdate()
 
@@ -317,7 +317,7 @@ class DataBase {
         val query = "DELETE FROM space_marine WHERE id = ?"
         val preparedStatement: PreparedStatement = connection.prepareStatement(query)
 
-        preparedStatement.setInt(1, spaceMarine.getId().toInt())
+        preparedStatement.setInt(1, spaceMarine.id.toInt())
 
         preparedStatement.executeUpdate()
 
@@ -327,7 +327,7 @@ class DataBase {
     fun deleteChapterAndCoordinates(spaceMarine: SpaceMarine) {
         var query = "SELECT chapter, coordinates FROM space_marine WHERE id = ?"
         var preparedStatement: PreparedStatement = connection.prepareStatement(query)
-        preparedStatement.setInt(1, spaceMarine.getId().toInt())
+        preparedStatement.setInt(1, spaceMarine.id.toInt())
         val resultSet: ResultSet = preparedStatement.executeQuery()
         var chapterId: Int? = null
         var coordinatesId: Int? = null

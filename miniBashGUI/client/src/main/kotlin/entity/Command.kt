@@ -5,11 +5,11 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class Command(
-    private var name: String,
-    private var spaceMarine: SpaceMarine? = null,
-    private var chapter: Chapter? = null,
-    private var commandArgument: String? = null,
-    private var id: Int = -1
+    var name: String,
+    var spaceMarine: SpaceMarine? = null,
+    var chapter: Chapter? = null,
+    var commandArgument: String? = null,
+    var id: Int = -1
 ) {
     constructor(name: String, spaceMarine: SpaceMarine?, commandArgument: String?, id: Int) : this(name, spaceMarine, null, commandArgument, id) {
     }

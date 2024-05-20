@@ -13,10 +13,10 @@ import kotlinx.serialization.Serializable
  */
 @Serializable
 class Chapter(
-    private var name: String?,
-    private var parentLegion: String? = null,
-    private var marineCount: Int?,
-    private var world: String?
+    var name: String?,
+    var parentLegion: String? = null,
+    var marineCount: Int?,
+    var world: String?
 ) : Comparable<Chapter> {
     init {
         fun checkName(name: String?) {

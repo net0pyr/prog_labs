@@ -22,18 +22,21 @@ import kotlin.math.abs
  */
 @Serializable
 class SpaceMarine(
-    private var name: String?,
-    private var coordinates: Coordinates?,
-    private var health: Double?,
-    private var height: Int? = null,
-    private var category: AstartesCategory?,
-    private var meleeWeapon: MeleeWeapon? = null,
-    private var chapter: Chapter? = null,
-    private var id: Long = 0
+    var name: String?,
+    var coordinates: Coordinates?,
+    var health: Double?,
+    var height: Int? = null,
+    var category: AstartesCategory?,
+    var meleeWeapon: MeleeWeapon? = null,
+    var chapter: Chapter? = null,
+    var id: Long = 0,
+    var creator: Int = 0
 ) : Comparable<SpaceMarine> {
     @Serializable(with = LocalDateTimeSerializer::class)
     /**Поле даты создания*/
     private val creationDate: LocalDateTime = LocalDateTime.now()
+
+    companion object {}
 
     init {
         id = abs(creationDate.toString().hashCode()).toLong()
@@ -92,33 +95,6 @@ class SpaceMarine(
             return this.height!!.compareTo(other.height!!)
         }
         return this.health!!.compareTo(other.health!!)
-    }
-
-    /** Метод для получения поля id*/
-    fun getId(): Long {
-        return id
-    }
-
-    /** Метод для изменения поля id
-     * @param newId новое значение id
-     * */
-    fun setId(newId: Long) {
-        id = newId
-    }
-
-    /** Метод для получения поля chapter*/
-    fun getChapter(): Chapter? {
-        return chapter
-    }
-
-    /** Метод для получения поля name*/
-    fun getName(): String? {
-        return name
-    }
-
-    /** Метод для получения поля meleeWeapon*/
-    fun getMeleeWeapon(): String {
-        return meleeWeapon!!.weaponName
     }
 
     override fun toString(): String {

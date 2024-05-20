@@ -33,7 +33,7 @@ class Add_if_max : CommandExample() {
                 if (spaceMarine != null)
                     if (spaceMarine > SpaceMarineInTreeSet.spaceMarines.last()) {
                         val idSpaceMarine = Server.dataBase.add(spaceMarine,id)
-                        spaceMarine.setId(idSpaceMarine)
+                        spaceMarine.id = (idSpaceMarine)
                         SpaceMarineInTreeSet.spaceMarines.add(spaceMarine)
                         res  = "Элемент успешно добавлен"
                     } else {

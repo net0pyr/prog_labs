@@ -10,7 +10,7 @@ import kotlinx.serialization.Serializable
  * @author net0pyr
  */
 @Serializable
-class Coordinates(private var x: Float?, private var y: Double?) {
+class Coordinates(var x: Float?, var y: Double?) {
     init {
         fun checkXY(x: Float?, y: Double?) {
             if (x == null || y == null) {
@@ -20,7 +20,7 @@ class Coordinates(private var x: Float?, private var y: Double?) {
             }
         }
         try {
-            checkXY(x, y);
+            checkXY(x, y)
         } catch (e: MyIllegalArgumentException) {
             println("Ошибка: ${e.message}")
         }

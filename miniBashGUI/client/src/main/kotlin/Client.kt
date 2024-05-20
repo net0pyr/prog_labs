@@ -1,7 +1,11 @@
 package com.net0pyr
 
 import com.net0pyr.WorkingWithCommand.CommandHandler
-import com.net0pyr.commands.ExecuteScript
+import com.net0pyr.entity.Command
+import com.net0pyr.gui.Login
+import com.net0pyr.gui.SpaceMarinesTable
+import com.net0pyr.gui.UserApplication
+import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import java.net.ConnectException
@@ -13,6 +17,8 @@ import java.nio.channels.Selector
 import java.nio.channels.SocketChannel
 import java.security.MessageDigest
 import java.util.*
+import javax.swing.JOptionPane
+import javax.swing.SwingUtilities
 
 class Client {
     private val host = "localhost"
@@ -22,12 +28,18 @@ class Client {
     private var isConnected = false
     private var isFirst = true
     private var isLogin = false
-    private var id = -1
+    companion object {
+        var command = Command("no")
+        var id = -1
+    }
     fun start(scanner: Scanner) {
         val clientChannel = SocketChannel.open()
         clientChannel.configureBlocking(false)
         clientChannel.connect(InetSocketAddress(host, port))
         clientChannel.register(selector, SelectionKey.OP_CONNECT)
+        val login = Login()
+        login.execute()
+
 
         while (true) {
             selector.select()
@@ -37,8 +49,8 @@ class Client {
                 val key = keyIterator.next()
                 keyIterator.remove()
                 when {
-                    key.isConnectable -> connectToServer(clientChannel, scanner)
-                    key.isReadable -> readFromServer(clientChannel, scanner)
+                    key.isConnectable -> connectToServer(clientChannel)
+                    key.isReadable -> readFromServer(clientChannel)
                 }
             }
             if (!isConnected) {
@@ -47,7 +59,7 @@ class Client {
         }
     }
 
-    private fun connectToServer(clientChannel: SocketChannel, scanner: Scanner) {
+    private fun connectToServer(clientChannel: SocketChannel) {
         try {
             if (clientChannel.isConnectionPending) {
                 clientChannel.finishConnect()
@@ -55,9 +67,9 @@ class Client {
                 clientChannel.register(selector, SelectionKey.OP_READ)
                 isConnected = true
 
-                readFromServer(clientChannel, scanner)
+                readFromServer(clientChannel)
 
-                readLine(scanner, clientChannel)
+                readLine(clientChannel)
             }
         } catch (_: ClosedChannelException) {
             clientChannel.register(selector, SelectionKey.OP_CONNECT)
@@ -66,7 +78,7 @@ class Client {
         }
     }
 
-    private fun readFromServer(clientChannel: SocketChannel, scanner: Scanner) {
+    private fun readFromServer(clientChannel: SocketChannel) {
         if (isFirst) {
             selector.select(50)
             buffer.clear()
@@ -89,73 +101,68 @@ class Client {
             val data = ByteArray(buffer.remaining())
             buffer.get(data)
             val message = String(data).split(":")[0]
-            if(message == "Аккаунт успешно добавлен. Можете воспользоваться командой help, чтобы ознакомиться с командами."||
-                message == "Вход успешно выполнен") {
+            if (message == "Аккаунт успешно добавлен. Можете воспользоваться командой help, чтобы ознакомиться с командами." ||
+                message == "Вход успешно выполнен"
+            ) {
                 isLogin = true
                 id = String(data).split(":")[1].toInt()
+                Login.frame.dispose()
+                SwingUtilities.invokeLater {
+                    UserApplication().isVisible = true
+                }
+            } else if (message == "Неверный логин или пароль" ||
+                message == "Ошибка создания аккаунта" ||
+                message == "Аккаунт с таким логином уже существует"
+            ) {
+                JOptionPane.showMessageDialog(Login.frame, message, "Error", JOptionPane.ERROR_MESSAGE)
+                Login.loginFlag = -1
+            }
+            if(command.name == "show") {
+                SpaceMarinesTable.data.clear()
+                SpaceMarinesTable.data = Json.decodeFromString(message)
+                command.name = "no"
             }
             println(message)
             if (isConnected && CommandHandler.executeScriptFlag) {
-                readLine(scanner, clientChannel)
+                readLine(clientChannel)
             } else {
                 if (isConnected) {
-                    readLine(scanner, clientChannel)
+                    readLine(clientChannel)
                 }
             }
         }
     }
 
-    private fun readLine(scanner: Scanner, clientChannel: SocketChannel) {
+    private fun readLine(clientChannel: SocketChannel) {
         lateinit var outputString: String
-        if (!CommandHandler.executeScriptFlag) {
-            val commandHandler = CommandHandler()
-            if(isLogin) {
-                val inputString = scanner.nextLine()
-                if (inputString == "exit") {
-                    println("Отключение от сервера")
-                    clientChannel.close()
-                    isConnected = false
-                    return
-                }
-                outputString = commandHandler.execute(inputString, id)
-            } else {
-                println("У Вас есть аккаунт(1-да, 2-нет):")
-                val typeOfLogin: String = scanner.nextLine()
-                when(typeOfLogin) {
-                    "1" -> {
-                        println("Логин:")
-                        val login = scanner.nextLine()
-                        println("Пароль:")
-                        val password = scanner.nextLine()
-                        outputString = "1:${login}:${sha256(password)}"
+        if (isLogin) {
+            while (true) {
+                selector.select(50)
+                when (command.name) {
+                    "no" -> continue
+                    else -> {
+                        command.id = id
+                        outputString = Json.encodeToString(command)
                     }
-                    "2" ->  {
-                        println("Придумайте логин:")
-                        val login = scanner.nextLine()
-                        println("Придумайте пароль:")
-                        val password = scanner.nextLine()
-                        println("Повторите пароль:")
-                        val repeatPassword = scanner.nextLine()
-                        if(password != repeatPassword) {
-                            println("Ошибка создания аккаунта. Пароли не совпадают")
-                        } else {
-                            outputString = "2:${login}:${sha256(password)}"
-                        }
-                    }
-                    else -> println("Неверный формат ввода")
                 }
             }
-        }
-        if (CommandHandler.executeScriptFlag || outputString == "executeScript") {
-            val index = ExecuteScript.index
-            val command = ExecuteScript.commands[index]
-            ExecuteScript.index++
-            if (ExecuteScript.index == ExecuteScript.commands.size) {
-                CommandHandler.executeScriptFlag = false
-                ExecuteScript.index = 0
-                ExecuteScript.commands.clear()
+        } else {
+            while (true) {
+                selector.select(50)
+                when (Login.loginFlag) {
+                    1 -> {
+                        outputString = "1:${Login.username}:${sha256(Login.password)}"
+                        break
+                    }
+
+                    2 -> {
+                        outputString = "2:${Login.username}:${sha256(Login.password)}"
+                        break
+                    }
+
+                    -1 -> continue
+                }
             }
-            outputString = Json.encodeToString(command)
         }
         val outputBuffer = ByteBuffer.wrap(outputString.toByteArray())
         clientChannel.write(outputBuffer)

@@ -21,14 +21,15 @@ import kotlinx.serialization.Serializable
  */
 @Serializable
 class SpaceMarine(
-    private var name: String?,
-    private var coordinates: Coordinates?,
-    private var health: Double?,
-    private var height: Int? = null,
-    private var category: AstartesCategory?,
-    private var meleeWeapon: MeleeWeapon? = null,
-    private var chapter: Chapter? = null,
-    private var id: Long = 0
+    var name: String?,
+    var coordinates: Coordinates?,
+    var health: Double?,
+    var height: Int? = null,
+    var category: AstartesCategory?,
+    var meleeWeapon: MeleeWeapon? = null,
+    var chapter: Chapter? = null,
+    var id: Long = 0,
+    var creator: Int = 0
 ) : Comparable<SpaceMarine> {
     @Serializable(with = LocalDateTimeSerializer::class)
     /**Поле даты создания*/
@@ -89,45 +90,6 @@ class SpaceMarine(
         return this.id.compareTo(other.id)
     }
 
-    /** Метод для получения поля id*/
-    fun getId(): Long {
-        return id
-    }
-
-    /** Метод для изменения поля id
-     * @param newId новое значение id
-     * */
-    fun setId(newId: Long) {
-        id = newId
-    }
-
-    /** Метод для получения поля chapter*/
-    fun getChapter(): Chapter? {
-        return chapter
-    }
-
-    /** Метод для получения поля name*/
-    fun getName(): String? {
-        return name
-    }
-
-    /** Метод для получения поля meleeWeapon*/
-    fun getMeleeWeapon(): String {
-        return meleeWeapon!!.weaponName
-    }
-    fun getHealth(): Double? {
-        return health
-    }
-    fun getHeight(): Int? {
-        return height
-    }
-
-    fun getCoordinates(): Coordinates? {
-        return coordinates
-    }
-    fun getCategory(): String {
-        return category!!.categoryName
-    }
     override fun toString(): String {
         return "Имя - $name, id - $id"
     }

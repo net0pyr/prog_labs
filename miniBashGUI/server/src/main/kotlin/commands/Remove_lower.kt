@@ -31,14 +31,14 @@ class Remove_lower : CommandExample() {
                 if (spaceMarine != null) {
                     val spaceMarineComparator = Comparator<SpaceMarine> { sm1, sm2 ->
                         when {
-                            sm1.getHealth() == null && sm2.getHealth() != null -> -1
-                            sm1.getHealth() != null && sm2.getHealth() == null -> 1
-                            sm1.getHealth() != null && sm2.getHealth() != null -> {
-                                val healthComparison = sm1.getHealth()!!.compareTo(sm2.getHealth()!!)
+                            sm1.health == null && sm2.health != null -> -1
+                            sm1.health != null && sm2.health == null -> 1
+                            sm1.health != null && sm2.health != null -> {
+                                val healthComparison = sm1.health!!.compareTo(sm2.health!!)
                                 if (healthComparison != 0) {
                                     healthComparison
                                 } else {
-                                    sm1.getHeight()?.compareTo(sm2.getHeight() ?: 0) ?: 0
+                                    sm1.height?.compareTo(sm2.height ?: 0) ?: 0
                                 }
                             }
 
@@ -47,7 +47,7 @@ class Remove_lower : CommandExample() {
                     }
                     SpaceMarineInTreeSet.spaceMarines.forEach {
                         if (spaceMarineComparator.compare(it, spaceMarine) < 0 &&
-                                Server.dataBase.getCreatorSpaceMarine(it.getId()) == id) {
+                                Server.dataBase.getCreatorSpaceMarine(it.id) == id) {
                             SpaceMarineInTreeSet.spaceMarines.remove(it)
                             Server.dataBase.deleteSpaceMarine(it)
                         }

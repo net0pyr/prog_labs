@@ -30,7 +30,7 @@ class Add : CommandExample() {
             try {
                 if (spaceMarine != null) {
                     val idSpaceMarine = Server.dataBase.add(spaceMarine,id)
-                    spaceMarine.setId(idSpaceMarine)
+                    spaceMarine.id = (idSpaceMarine)
                     SpaceMarineInTreeSet.spaceMarines.add(spaceMarine)
                     "Элемент успешно добавлен"
                 } else {
