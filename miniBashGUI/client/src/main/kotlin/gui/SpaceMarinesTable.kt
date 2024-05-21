@@ -1,9 +1,11 @@
 package com.net0pyr.gui
 
 import com.net0pyr.Client
+import com.net0pyr.army.Chapter
 import com.net0pyr.entity.SpaceMarine
 import com.net0pyr.enums.AstartesCategory
 import com.net0pyr.enums.MeleeWeapon
+import com.net0pyr.location.Coordinates
 import java.util.*
 import javax.swing.table.DefaultTableModel
 
@@ -36,7 +38,6 @@ class SpaceMarinesTable(locale: Locale = Locale.getDefault()) : DefaultTableMode
         val spaceMarine = data[row]
 
         when (column) {
-            0 -> spaceMarine.id = (aValue as String).toLong()
             1 -> spaceMarine.name = aValue as String
             2 -> spaceMarine.coordinates?.x = (aValue as String).toFloat()
             3 -> spaceMarine.coordinates?.y = (aValue as String).toDouble()
@@ -49,8 +50,23 @@ class SpaceMarinesTable(locale: Locale = Locale.getDefault()) : DefaultTableMode
             10 -> spaceMarine.chapter?.marineCount = (aValue as String).toInt()
             11 -> spaceMarine.chapter?.world = aValue as String
         }
-    }
 
+        val updatedSpaceMarine = SpaceMarine(
+            spaceMarine.name,
+            Coordinates(spaceMarine.coordinates?.x, spaceMarine.coordinates?.y),
+            spaceMarine.health,
+            spaceMarine.height,
+            spaceMarine.category,
+            spaceMarine.meleeWeapon,
+            Chapter(spaceMarine.chapter?.name, spaceMarine.chapter?.parentLegion, spaceMarine.chapter?.marineCount, spaceMarine.chapter?.world),
+            spaceMarine.id,
+            spaceMarine.creator
+        )
+
+        Client.command.spaceMarine = updatedSpaceMarine
+        Client.command.commandArgument = updatedSpaceMarine.id.toString()
+        Client.command.name = "update"
+    }
 
     fun addObject(spaceMarine: SpaceMarine) {
         data.add(spaceMarine)
@@ -78,7 +94,7 @@ class SpaceMarinesTable(locale: Locale = Locale.getDefault()) : DefaultTableMode
     }
 
     fun refreshTable() {
-        setRowCount(0) // Clear the existing rows
+        rowCount = 0
         data.forEach { addRow(toRow(it)) }
     }
 }

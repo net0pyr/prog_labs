@@ -5,7 +5,7 @@ package com.net0pyr.enums
  * @author net0pyr
  */
 enum class AstartesCategory(val categoryName: String) {
-    SCOUT("Scout"),
-    CHAPLAIN("Chaplain"),
-    HELIX("Helix")
+    SCOUT("SCOUT"),
+    CHAPLAIN("CHAPLAIN"),
+    HELIX("HELIX")
 }

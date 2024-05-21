@@ -119,10 +119,11 @@ class Client {
             }
             if(command.name == "show") {
                 SpaceMarinesTable.data.clear()
-                String(data).split("|").forEach {
-                    println(it)
+                println(String(data).split("\n"))
+                String(data).split("\n").forEach {
                     SpaceMarinesTable.data.add(Json.decodeFromString(it))
                 }
+                UserApplication.tableModel.refreshTable()
             }
             if(command.name == "add") {
                 UserApplication.tableModel.addObject(Json.decodeFromString(message))

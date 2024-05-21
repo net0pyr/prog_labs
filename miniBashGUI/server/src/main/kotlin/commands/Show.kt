@@ -35,7 +35,7 @@ class Show : CommandExample() {
 //                        outputString.append(" - Ваш десантник")
 //                    }
 //                }
-                outputString+=("|")
+                outputString+=("\n")
             }
             outputString
         }

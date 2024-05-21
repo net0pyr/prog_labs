@@ -204,7 +204,7 @@ class DataBase {
         var creator = -1
 
         if (resultSet.next()) {
-            creator = resultSet.getInt("id")
+            creator = resultSet.getInt("creator")
         }
 
         preparedStatement.close()
@@ -289,8 +289,6 @@ class DataBase {
     }
 
     fun updateSpaceMarine(spaceMarine: SpaceMarine, creator: Int) {
-
-
         val coordinatesId = spaceMarine.coordinates?.let { addCoordinates(it, creator) }
         val chapterId = spaceMarine.chapter?.let { addChapter(it, creator) }
 
@@ -301,19 +299,43 @@ class DataBase {
         preparedStatement.setString(1, spaceMarine.name)
         if (coordinatesId != null) {
             preparedStatement.setInt(2, coordinatesId)
+        } else {
+            preparedStatement.setNull(2, java.sql.Types.INTEGER)
         }
-        spaceMarine.health?.let { preparedStatement.setDouble(3, it) }
-        spaceMarine.height?.let { preparedStatement.setInt(4, it) }
-        preparedStatement.setString(5, spaceMarine.category.toString())
-        preparedStatement.setString(6, spaceMarine.meleeWeapon.toString())
-        preparedStatement.setString(7, chapterId.toString())
+        if (spaceMarine.health != null) {
+            preparedStatement.setDouble(3, spaceMarine.health!!)
+        } else {
+            preparedStatement.setNull(3, java.sql.Types.DOUBLE)
+        }
+        if (spaceMarine.height != null) {
+            preparedStatement.setInt(4, spaceMarine.height!!)
+        } else {
+            preparedStatement.setNull(4, java.sql.Types.INTEGER)
+        }
+
+        if (spaceMarine.category != null) {
+            preparedStatement.setObject(5, spaceMarine.category, java.sql.Types.OTHER)
+        } else {
+            preparedStatement.setNull(5, java.sql.Types.OTHER)
+        }
+
+        if (spaceMarine.meleeWeapon != null) {
+            preparedStatement.setObject(6, spaceMarine.meleeWeapon, java.sql.Types.OTHER)
+        } else {
+            preparedStatement.setNull(6, java.sql.Types.OTHER)
+        }
+
+        if (chapterId != null) {
+            preparedStatement.setInt(7, chapterId)
+        } else {
+            preparedStatement.setNull(7, java.sql.Types.INTEGER)
+        }
+
         preparedStatement.setInt(8, spaceMarine.id.toInt())
 
         preparedStatement.executeUpdate()
-
         preparedStatement.close()
     }
-
     fun deleteSpaceMarine(spaceMarine: SpaceMarine) {
         deleteChapterAndCoordinates(spaceMarine)
         val query = "DELETE FROM space_marine WHERE id = ?"

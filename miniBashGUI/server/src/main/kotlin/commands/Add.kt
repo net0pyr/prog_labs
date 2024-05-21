@@ -34,7 +34,7 @@ class Add : CommandExample() {
                     val idSpaceMarine = Server.dataBase.add(spaceMarine,id)
                     spaceMarine.id = (idSpaceMarine)
                     SpaceMarineInTreeSet.spaceMarines.add(spaceMarine)
-                    Json.encodeToString(SpaceMarine)
+                    Json.encodeToString(spaceMarine)
                 } else {
                     null
                 }
