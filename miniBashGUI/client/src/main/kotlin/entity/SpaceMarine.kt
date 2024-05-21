@@ -29,7 +29,9 @@ class SpaceMarine(
     var category: AstartesCategory?,
     var meleeWeapon: MeleeWeapon? = null,
     var chapter: Chapter? = null,
+    @Serializable
     var id: Long = 0,
+    @Serializable
     var creator: Int = 0
 ) : Comparable<SpaceMarine> {
     @Serializable(with = LocalDateTimeSerializer::class)
@@ -39,7 +41,6 @@ class SpaceMarine(
     companion object {}
 
     init {
-        id = abs(creationDate.toString().hashCode()).toLong()
         fun checkHealth(health: Double?) {
             if (health == null) {
                 throw MyIllegalArgumentException("Пехотинец прошел жестокую подготовку и был воспитан войном. Его здоровье не может быть нулевым.")

@@ -5,6 +5,8 @@ import com.net0pyr.WorkingWithCommand.CommandHandler
 import com.net0pyr.army.Chapter
 import com.net0pyr.entity.SpaceMarine
 import com.net0pyr.entity.SpaceMarineInTreeSet
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 import java.util.*
 
 /**
@@ -32,7 +34,7 @@ class Add : CommandExample() {
                     val idSpaceMarine = Server.dataBase.add(spaceMarine,id)
                     spaceMarine.id = (idSpaceMarine)
                     SpaceMarineInTreeSet.spaceMarines.add(spaceMarine)
-                    "Элемент успешно добавлен"
+                    Json.encodeToString(SpaceMarine)
                 } else {
                     null
                 }

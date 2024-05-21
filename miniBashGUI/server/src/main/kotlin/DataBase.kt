@@ -104,29 +104,29 @@ class DataBase {
         return id
     }
 
-    fun addInHistory(command:String, id: Int) {
-        val query = "INSERT INTO history (command, creator) VALUES (?, ?)"
-        val preparedStatement: PreparedStatement = connection.prepareStatement(query, Statement.RETURN_GENERATED_KEYS)
+//    fun addInHistory(command:String, id: Int) {
+//        val query = "INSERT INTO history (command, creator) VALUES (?, ?)"
+//        val preparedStatement: PreparedStatement = connection.prepareStatement(query, Statement.RETURN_GENERATED_KEYS)
+//
+//        preparedStatement.setString(1, command)
+//        preparedStatement.setInt(2, id)
+//
+//        preparedStatement.executeUpdate()
+//
+//        preparedStatement.close()
+//    }
 
-        preparedStatement.setString(1, command)
-        preparedStatement.setInt(2, id)
-
-        preparedStatement.executeUpdate()
-
-        preparedStatement.close()
-    }
-
-    fun deleteFromHistory(command:String, id: Int) {
-        val query = "DELETE FROM history WHERE creator = ? AND command = ? LIMIT 1"
-        val preparedStatement: PreparedStatement = connection.prepareStatement(query)
-
-        preparedStatement.setInt(1, id)
-        preparedStatement.setString(2, command)
-
-        preparedStatement.executeUpdate()
-
-        preparedStatement.close()
-    }
+//    fun deleteFromHistory(command:String, id: Int) {
+//        val query = "DELETE FROM history WHERE creator = ? AND command = ? LIMIT 1"
+//        val preparedStatement: PreparedStatement = connection.prepareStatement(query)
+//
+//        preparedStatement.setInt(1, id)
+//        preparedStatement.setString(2, command)
+//
+//        preparedStatement.executeUpdate()
+//
+//        preparedStatement.close()
+//    }
 
     fun fill(lock: ReentrantReadWriteLock) {
         lock.readLock().lock()
@@ -158,7 +158,7 @@ class DataBase {
             SpaceMarineInTreeSet.creationTime = LocalDateTime.now()
             val query =
                 "SELECT space_marine.id as id, space_marine.name as name, space_marine.coordinates as coordinates, health, height, category, " +
-                        "meleeWeapon, chapter, chapter.name as chapter_name, parent_legion, marines_count, world, x, y FROM space_marine " +
+                        "meleeWeapon, chapter, chapter.name as chapter_name, parent_legion, marines_count, world, x, y, space_marine.creator as creator FROM space_marine " +
                         "LEFT JOIN chapter on chapter.id = space_marine.chapter " +
                         "LEFT JOIN coordinates on coordinates.id = space_marine.coordinates; "
             val preparedStatement: PreparedStatement = connection.prepareStatement(query)
@@ -179,7 +179,9 @@ class DataBase {
                     resultSet.getInt("height"),
                     AstartesCategory.valueOf(resultSet.getString("category").uppercase(Locale.getDefault()).replace(' ','_')),
                     MeleeWeapon.valueOf(resultSet.getString("meleeweapon").uppercase().replace(' ','_')),
-                    chapter
+                    chapter,
+                    resultSet.getLong("id"),
+                    resultSet.getInt("creator")
                 )
                 SpaceMarineInTreeSet.spaceMarines.add(spaceMarine)
             }

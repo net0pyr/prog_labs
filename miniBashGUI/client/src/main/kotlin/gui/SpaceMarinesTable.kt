@@ -1,5 +1,6 @@
 package com.net0pyr.gui
 
+import com.net0pyr.Client
 import com.net0pyr.entity.SpaceMarine
 import com.net0pyr.enums.AstartesCategory
 import com.net0pyr.enums.MeleeWeapon
@@ -17,7 +18,6 @@ class SpaceMarinesTable(locale: Locale = Locale.getDefault()) : DefaultTableMode
         columnNames.forEach { addColumn(it) }
         data.forEach { addRow(toRow(it)) }
     }
-
     private fun toRow(spaceMarine: SpaceMarine): Vector<Any> = Vector(
         arrayOf(
             spaceMarine.id, spaceMarine.name, spaceMarine.coordinates!!.x, spaceMarine.coordinates!!.y,
@@ -75,5 +75,10 @@ class SpaceMarinesTable(locale: Locale = Locale.getDefault()) : DefaultTableMode
         val vectorData = filteredObjects.map { toRow(it) }.toCollection(Vector())
         val vectorColumns = columnNames.toCollection(Vector())
         setDataVector(vectorData, vectorColumns)
+    }
+
+    fun refreshTable() {
+        setRowCount(0) // Clear the existing rows
+        data.forEach { addRow(toRow(it)) }
     }
 }

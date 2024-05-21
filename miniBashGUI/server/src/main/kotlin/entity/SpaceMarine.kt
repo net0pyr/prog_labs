@@ -28,7 +28,9 @@ class SpaceMarine(
     var category: AstartesCategory?,
     var meleeWeapon: MeleeWeapon? = null,
     var chapter: Chapter? = null,
+    @Serializable
     var id: Long = 0,
+    @Serializable
     var creator: Int = 0
 ) : Comparable<SpaceMarine> {
     @Serializable(with = LocalDateTimeSerializer::class)

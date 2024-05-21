@@ -1,12 +1,12 @@
-CREATE TYPE melle_weapon AS ENUM ('Chain sword',
-    'Power sword',
-    'Chain axe',
-    'Manreaper',
-    'Power blade');
+CREATE TYPE melle_weapon AS ENUM ('CHAIN_SWORD',
+    'POWER_SWORD',
+    'CHAIN_AXE',
+    'MANREAPER',
+    'POWER_BLADE');
 
-CREATE TYPE astrates_category AS ENUM ('Scout',
-    'Chaplain',
-    'Helix');
+CREATE TYPE astrates_category AS ENUM ('SCOUT',
+    'CHAPLAIN',
+    'HELIX');
 
 CREATE TABLE account
 (
@@ -53,3 +53,13 @@ CREATE TABLE history
     command VARCHAR(255),
     creator INT REFERENCES account(id) ON DELETE CASCADE
 );
+
+DROP TABLE space_marine;
+DROP TABLE chapter;
+DROP TABLE coordinates;
+DROP TABLE history;
+DROP TABLE account;
+DROP TYPE astrates_category;
+DROP TYPE melle_weapon;
+
+DELETE FROM space_marine where id > 1;

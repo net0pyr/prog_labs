@@ -16,13 +16,16 @@ import java.util.*
 import javax.swing.*
 
 class UserApplication : JFrame() {
-    private val tableModel = SpaceMarinesTable()
-    private val table = JTable(tableModel)
-    private val visualizationPanel = VisualizationPanel(SpaceMarinesTable.data)
-    private val languageSwitcher = JComboBox(arrayOf("English", "Русский"))
-    var resourceBundle = ResourceBundle.getBundle("messages", Locale.getDefault())
-
+    companion object {
+        var tableModel: SpaceMarinesTable = SpaceMarinesTable()
+        var table: JTable = JTable(tableModel)
+        var visualizationPanel: VisualizationPanel = VisualizationPanel(SpaceMarinesTable.data)
+        val languageSwitcher = JComboBox(arrayOf("English", "Русский"))
+        var resourceBundle = ResourceBundle.getBundle("messages", Locale("en"))
+    }
     init {
+        Client.command.name = "show"
+        Client.selector.select(50)
         title = "User Application"
         defaultCloseOperation = EXIT_ON_CLOSE
         size = Dimension(1000, 800)
@@ -40,7 +43,7 @@ class UserApplication : JFrame() {
                 addActionListener {
                     val spaceMarine = showAddDialog()
                     if (spaceMarine != null) {
-                        tableModel.addObject(spaceMarine)
+                        spaceMarine.creator = Client.id
                     }
                     Client.command.spaceMarine = spaceMarine
                     Client.command.name = "add"
@@ -79,8 +82,8 @@ class UserApplication : JFrame() {
                 table.rowSorter.sortKeys = listOf(RowSorter.SortKey(column, newSortOrder))
             }
         })
+        tableModel.refreshTable()
     }
-
 
     private fun executeCommand(command: String) {
         JOptionPane.showMessageDialog(this, "$command executed")
@@ -99,7 +102,7 @@ class UserApplication : JFrame() {
 
     private fun switchLanguage(language: String) {
         when (language) {
-            "English" -> initLocalization(Locale.getDefault())
+            "English" -> initLocalization(Locale("en"))
             "Русский" -> initLocalization(Locale("ru"))
         }
     }

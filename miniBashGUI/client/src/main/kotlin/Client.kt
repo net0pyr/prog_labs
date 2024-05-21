@@ -23,7 +23,6 @@ import javax.swing.SwingUtilities
 class Client {
     private val host = "localhost"
     private val port = 12345
-    private val selector = Selector.open()
     private val buffer = ByteBuffer.allocate(4096)
     private var isConnected = false
     private var isFirst = true
@@ -31,6 +30,7 @@ class Client {
     companion object {
         var command = Command("no")
         var id = -1
+        val selector: Selector = Selector.open()
     }
     fun start(scanner: Scanner) {
         val clientChannel = SocketChannel.open()
@@ -119,10 +119,15 @@ class Client {
             }
             if(command.name == "show") {
                 SpaceMarinesTable.data.clear()
-                SpaceMarinesTable.data = Json.decodeFromString(message)
-                command.name = "no"
+                String(data).split("|").forEach {
+                    println(it)
+                    SpaceMarinesTable.data.add(Json.decodeFromString(it))
+                }
             }
-            println(message)
+            if(command.name == "add") {
+                UserApplication.tableModel.addObject(Json.decodeFromString(message))
+            }
+            command.name = "no"
             if (isConnected && CommandHandler.executeScriptFlag) {
                 readLine(clientChannel)
             } else {
@@ -141,8 +146,10 @@ class Client {
                 when (command.name) {
                     "no" -> continue
                     else -> {
+                        println(command.name)
                         command.id = id
                         outputString = Json.encodeToString(command)
+                        break
                     }
                 }
             }
