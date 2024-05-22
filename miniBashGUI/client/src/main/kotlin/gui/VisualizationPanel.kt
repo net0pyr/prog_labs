@@ -31,8 +31,8 @@ class VisualizationPanel(private val objects: List<SpaceMarine>) : JPanel() {
         val rect = Rectangle(
             spaceMarine.coordinates!!.x!!.toInt(),
             spaceMarine.coordinates!!.y!!.toInt(),
-            spaceMarine.height!!/10,
-            spaceMarine.health!!.toInt()/10
+            spaceMarine.health!!.toInt(),
+            spaceMarine.health!!.toInt()
         )
         return rect.contains(point)
     }
@@ -43,8 +43,8 @@ class VisualizationPanel(private val objects: List<SpaceMarine>) : JPanel() {
             g.color = if (it.creator == Client.id) Color.BLUE else Color.RED
             g.fillRect(it.coordinates!!.x!!.toInt(),
                 it.coordinates!!.y!!.toInt(),
-                it.height!!/10,
-                it.health!!.toInt()/10
+                it.health!!.toInt(),
+                it.health!!.toInt()
             )
         }
     }

@@ -123,12 +123,30 @@ class Client {
                 String(data).split("\n").forEach {
                     SpaceMarinesTable.data.add(Json.decodeFromString(it))
                 }
+                //UserApplication.tableModel.refreshTable()
+                selector.select(50)
+//                UserApplication.tableModel.fireTableDataChanged() // Уведомление о изменениях данных в модели
+//                UserApplication.table.repaint()
                 UserApplication.tableModel.refreshTable()
+                UserApplication.visualizationPanel.revalidate()
+                UserApplication.visualizationPanel.repaint()
+                command.name = "no"
+            } else if(String(data) != "null") {
+                if (command.name == "add" && String(data) != "null") {
+                    UserApplication.tableModel.addObject(Json.decodeFromString(String(data).split("\n")[0]))
+                }
+                command.name = "show"
+                command.spaceMarine = null
+                command.chapter = null
+                command.commandArgument = null
+                command.id = id
+            } else {
+                command.name = "no"
+                command.spaceMarine = null
+                command.chapter = null
+                command.commandArgument = null
+                command.id = id
             }
-            if(command.name == "add") {
-                UserApplication.tableModel.addObject(Json.decodeFromString(message))
-            }
-            command.name = "no"
             if (isConnected && CommandHandler.executeScriptFlag) {
                 readLine(clientChannel)
             } else {

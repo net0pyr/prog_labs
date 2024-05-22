@@ -9,6 +9,7 @@ import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import java.nio.channels.ClosedChannelException
 import java.util.*
+import java.util.stream.Stream
 
 fun main() {
     Scanner(System.`in`).use { scanner ->

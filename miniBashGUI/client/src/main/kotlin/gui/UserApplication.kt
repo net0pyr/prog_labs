@@ -2,6 +2,8 @@ package com.net0pyr.gui
 
 import com.net0pyr.Client
 import com.net0pyr.army.Chapter
+import com.net0pyr.comparators.DoubleStringComparator
+import com.net0pyr.comparators.IntStringComparator
 import com.net0pyr.entity.SpaceMarine
 import com.net0pyr.enums.AstartesCategory
 import com.net0pyr.enums.MeleeWeapon
@@ -16,6 +18,7 @@ import java.awt.event.MouseEvent
 import java.util.*
 import javax.swing.*
 import javax.swing.RowFilter
+import javax.swing.event.TableModelEvent
 import javax.swing.table.TableRowSorter
 
 class UserApplication : JFrame() {
@@ -28,16 +31,16 @@ class UserApplication : JFrame() {
     }
 
     private val sorter = TableRowSorter(tableModel)
-    private val filterPanel = JPanel(GridLayout(1, tableModel.columnCount))
-
+    private val filterPanel = JPanel(GridLayout(1, tableModel.columnCount)).apply {
+        preferredSize = Dimension(preferredSize.width, 20)
+    }
     init {
-        Client.command.name = "show"
+
         Client.selector.select(50)
         title = "User Application"
         defaultCloseOperation = EXIT_ON_CLOSE
         size = Dimension(1000, 800)
         layout = BorderLayout()
-
         // Панель информации
         // Создаем панель для размещения элементов управления
         val controlPanel = JPanel().apply {
@@ -53,6 +56,7 @@ class UserApplication : JFrame() {
 
         // Добавляем панель управления в верхнюю часть окна
         add(controlPanel, BorderLayout.NORTH)
+
 
         // Панель с кнопками
         val buttonsPanel = JPanel().apply {
@@ -79,7 +83,6 @@ class UserApplication : JFrame() {
         }
 
 
-        // Панель фильтров
         val filters = mutableListOf<JComponent>()
 
         for (i in 0 until tableModel.columnCount) {
@@ -113,57 +116,62 @@ class UserApplication : JFrame() {
             filters.add(filterComponent)
         }
 
-        // Создаем панель для таблицы и фильтров
-        val tablePanel = JPanel().apply {
+        val tableWithFilter = JPanel().apply {
             layout = BorderLayout()
-
-            // Создаем панель для таблицы и фильтров
-            val filterPanel = JPanel().apply {
-                layout = BorderLayout()
-                add(JScrollPane(table), BorderLayout.CENTER)
-                // Добавляем фильтры в нижнюю часть панели
-                add(createFiltersPanel(filters), BorderLayout.SOUTH)
-            }
-
-            // Добавляем панель таблицы и фильтров в левую часть панели
-            add(filterPanel, BorderLayout.WEST)
-
-            // Добавляем визуализацию в правую часть панели
-            add(visualizationPanel, BorderLayout.CENTER)
+            add(filterPanel, BorderLayout.NORTH)
+            add(JScrollPane(table), BorderLayout.CENTER)
         }
 
-        add(tablePanel, BorderLayout.CENTER)
-        // Добавляем компоненты на главный фрейм
-
-        //add(JScrollPane(table), BorderLayout.CENTER)
-        //add(visualizationPanel, BorderLayout.EAST)
+        add(tableWithFilter, BorderLayout.CENTER)
+        add(visualizationPanel, BorderLayout.EAST)
         add(buttonsPanel, BorderLayout.SOUTH)
-        //add(filterPanel, BorderLayout.NORTH)
 
         // Настраиваем переключатель языка
         languageSwitcher.addActionListener { switchLanguage(languageSwitcher.selectedItem as String) }
 
         // Включаем сортировку
+        val doubleComparator = DoubleStringComparator()
+        val intComparator = IntStringComparator()
+//        sorter.setComparator(0, intComparator)
+//        sorter.setComparator(5, intComparator)
+//        sorter.setComparator(10, intComparator)
+//        sorter.setComparator(2, doubleComparator)
+//        sorter.setComparator(3, doubleComparator)
+//        sorter.setComparator(4, doubleComparator)
         table.rowSorter = sorter
 
-        // Обновляем таблицу
-//        tableModel.refreshTable()
+        val categoryEditor = EnumCellEditor(AstartesCategory.entries.toTypedArray())
+        val weaponEditor = EnumCellEditor(MeleeWeapon.entries.toTypedArray())
+
+        table.columnModel.getColumn(6).cellEditor = categoryEditor
+        table.columnModel.getColumn(7).cellEditor = weaponEditor
+
+//        table.columnModel.getColumn(2).cellEditor = NumericCellEditor()
+//        table.columnModel.getColumn(3).cellEditor = NumericCellEditor()
+//        table.columnModel.getColumn(4).cellEditor = NumericCellEditor()
+//        table.columnModel.getColumn(5).cellEditor = NumericCellEditor()
+//        table.columnModel.getColumn(10).cellEditor = NumericCellEditor()
+//        table.columnModel.getColumn(6).cellEditor = EnumCellEditor(AstartesCategory::class.java)
+//        table.columnModel.getColumn(7).cellEditor = EnumCellEditor(MeleeWeapon::class.java)
+
+        table.tableHeader.addMouseListener(object : MouseAdapter() {
+            override fun mouseClicked(e: MouseEvent) {
+                val column = table.columnAtPoint(e.point)
+                val sortKeys = table.rowSorter.sortKeys
+                val currentSortKey = sortKeys.firstOrNull { it.column == column }
+                val newSortOrder = if (currentSortKey?.sortOrder == SortOrder.ASCENDING) {
+                    SortOrder.DESCENDING
+                } else {
+                    SortOrder.ASCENDING
+                }
+                table.rowSorter.toggleSortOrder(column)
+                table.rowSorter.sortKeys = listOf(RowSorter.SortKey(column, newSortOrder))
+            }
+        })
+
+
+        Client.command.name = "show"
     }
-
-    // Метод создания панели с фильтрами
-    private fun createFiltersPanel(filters: List<JComponent>): JPanel {
-        val filterPanel = JPanel(GridLayout(1, table.columnCount)).apply {
-            preferredSize = Dimension(800, 50) // Задаем размер панели
-        }
-
-        filters.forEach { filter ->
-            filterPanel.add(filter) // Добавляем каждый компонент фильтра на панель
-        }
-
-        return filterPanel
-    }
-
-
     private fun applyFilters() {
         val filters = mutableListOf<RowFilter<Any, Any>>()
 
@@ -172,7 +180,7 @@ class UserApplication : JFrame() {
             if (filterComponent is JTextField) {
                 val text = filterComponent.text
                 if (text.isNotEmpty()) {
-                    filters.add(RowFilter.regexFilter("(?i)$text", i))
+                    filters.add(RowFilter.regexFilter("$text", i))
                 }
             } else if (filterComponent is JComboBox<*>) {
                 val selectedItem = filterComponent.selectedItem
@@ -206,6 +214,7 @@ class UserApplication : JFrame() {
             "Русский" -> initLocalization(Locale("ru"))
         }
     }
+
 
     private fun showAddDialog(): SpaceMarine? {
         val dialogPanel = JPanel(GridLayout(0, 2))
@@ -279,7 +288,7 @@ class UserApplication : JFrame() {
                     Chapter(chapterNameR, parentLegionR, marinesCountR, worldR)
                 )
             } catch (e: NumberFormatException) {
-                JOptionPane.showMessageDialog(this, "Invalid input. Please enter valid numbers.")
+                JOptionPane.showMessageDialog(this, (resourceBundle.getString("addException")))
             }
         }
         return null
