@@ -15,10 +15,14 @@ import java.awt.event.KeyAdapter
 import java.awt.event.KeyEvent
 import java.awt.event.MouseAdapter
 import java.awt.event.MouseEvent
+import java.text.DecimalFormat
+import java.text.NumberFormat
 import java.util.*
 import javax.swing.*
 import javax.swing.RowFilter
 import javax.swing.event.TableModelEvent
+import javax.swing.table.TableColumn
+import javax.swing.table.TableColumnModel
 import javax.swing.table.TableRowSorter
 
 class UserApplication : JFrame() {
@@ -35,8 +39,6 @@ class UserApplication : JFrame() {
         preferredSize = Dimension(preferredSize.width, 20)
     }
     init {
-
-        Client.selector.select(50)
         title = "User Application"
         defaultCloseOperation = EXIT_ON_CLOSE
         size = Dimension(1000, 800)
@@ -86,17 +88,20 @@ class UserApplication : JFrame() {
         val filters = mutableListOf<JComponent>()
 
         for (i in 0 until tableModel.columnCount) {
-            val columnClass = tableModel.getColumnClass(i)
-            val filterComponent: JComponent = when {
-                columnClass == AstartesCategory::class.java -> {
-                    val comboBox = JComboBox(AstartesCategory.entries.toTypedArray())
+            val filterComponent: JComponent = when(i) {
+                6 -> {
+                    val categoriesWithEmpty = AstartesCategory.entries.map { it.toString() }.toMutableList()
+                    categoriesWithEmpty.add(0, "nothing")
+                    val comboBox = JComboBox(categoriesWithEmpty.toTypedArray())
                     comboBox.addActionListener {
                         applyFilters()
                     }
                     comboBox
                 }
-                columnClass == MeleeWeapon::class.java -> {
-                    val comboBox = JComboBox(MeleeWeapon.entries.toTypedArray())
+                7 -> {
+                    val categoriesWithEmpty = MeleeWeapon.entries.map { it.toString() }.toMutableList()
+                    categoriesWithEmpty.add(0, "nothing")
+                    val comboBox = JComboBox(categoriesWithEmpty.toTypedArray())
                     comboBox.addActionListener {
                         applyFilters()
                     }
@@ -129,46 +134,16 @@ class UserApplication : JFrame() {
         // Настраиваем переключатель языка
         languageSwitcher.addActionListener { switchLanguage(languageSwitcher.selectedItem as String) }
 
-        // Включаем сортировку
-        val doubleComparator = DoubleStringComparator()
-        val intComparator = IntStringComparator()
-//        sorter.setComparator(0, intComparator)
-//        sorter.setComparator(5, intComparator)
-//        sorter.setComparator(10, intComparator)
-//        sorter.setComparator(2, doubleComparator)
-//        sorter.setComparator(3, doubleComparator)
-//        sorter.setComparator(4, doubleComparator)
         table.rowSorter = sorter
 
-        val categoryEditor = EnumCellEditor(AstartesCategory.entries.toTypedArray())
-        val weaponEditor = EnumCellEditor(MeleeWeapon.entries.toTypedArray())
 
-        table.columnModel.getColumn(6).cellEditor = categoryEditor
-        table.columnModel.getColumn(7).cellEditor = weaponEditor
 
-//        table.columnModel.getColumn(2).cellEditor = NumericCellEditor()
-//        table.columnModel.getColumn(3).cellEditor = NumericCellEditor()
-//        table.columnModel.getColumn(4).cellEditor = NumericCellEditor()
-//        table.columnModel.getColumn(5).cellEditor = NumericCellEditor()
-//        table.columnModel.getColumn(10).cellEditor = NumericCellEditor()
-//        table.columnModel.getColumn(6).cellEditor = EnumCellEditor(AstartesCategory::class.java)
-//        table.columnModel.getColumn(7).cellEditor = EnumCellEditor(MeleeWeapon::class.java)
+        val categoryEditor = AstartesCategoryCellEditor(AstartesCategory.entries.toTypedArray())
+        table.setDefaultEditor(AstartesCategory::class.java, categoryEditor)
+        val weaponEditor = MeleeWeaponCellEditor(MeleeWeapon.entries.toTypedArray())
+        table.setDefaultEditor(MeleeWeapon::class.java, weaponEditor)
 
-        table.tableHeader.addMouseListener(object : MouseAdapter() {
-            override fun mouseClicked(e: MouseEvent) {
-                val column = table.columnAtPoint(e.point)
-                val sortKeys = table.rowSorter.sortKeys
-                val currentSortKey = sortKeys.firstOrNull { it.column == column }
-                val newSortOrder = if (currentSortKey?.sortOrder == SortOrder.ASCENDING) {
-                    SortOrder.DESCENDING
-                } else {
-                    SortOrder.ASCENDING
-                }
-                table.rowSorter.toggleSortOrder(column)
-                table.rowSorter.sortKeys = listOf(RowSorter.SortKey(column, newSortOrder))
-            }
-        })
-
+        initLocalization(Locale("en"))
 
         Client.command.name = "show"
     }
@@ -184,8 +159,8 @@ class UserApplication : JFrame() {
                 }
             } else if (filterComponent is JComboBox<*>) {
                 val selectedItem = filterComponent.selectedItem
-                if (selectedItem != null) {
-                    filters.add(RowFilter.regexFilter("^${selectedItem.toString()}$", i))
+                if (selectedItem != null && selectedItem != "nothing") {
+                    filters.add(RowFilter.regexFilter("^${selectedItem}$", i))
                 }
             }
         }
