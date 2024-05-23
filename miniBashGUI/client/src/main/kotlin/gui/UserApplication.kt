@@ -2,8 +2,6 @@ package com.net0pyr.gui
 
 import com.net0pyr.Client
 import com.net0pyr.army.Chapter
-import com.net0pyr.comparators.DoubleStringComparator
-import com.net0pyr.comparators.IntStringComparator
 import com.net0pyr.entity.SpaceMarine
 import com.net0pyr.enums.AstartesCategory
 import com.net0pyr.enums.MeleeWeapon
@@ -13,17 +11,10 @@ import java.awt.Dimension
 import java.awt.GridLayout
 import java.awt.event.KeyAdapter
 import java.awt.event.KeyEvent
-import java.awt.event.MouseAdapter
-import java.awt.event.MouseEvent
-import java.text.DecimalFormat
-import java.text.NumberFormat
 import java.util.*
 import javax.swing.*
-import javax.swing.RowFilter
-import javax.swing.event.TableModelEvent
-import javax.swing.table.TableColumn
-import javax.swing.table.TableColumnModel
 import javax.swing.table.TableRowSorter
+
 
 class UserApplication : JFrame() {
     companion object {
@@ -135,8 +126,6 @@ class UserApplication : JFrame() {
         languageSwitcher.addActionListener { switchLanguage(languageSwitcher.selectedItem as String) }
 
         table.rowSorter = sorter
-
-
 
         val categoryEditor = AstartesCategoryCellEditor(AstartesCategory.entries.toTypedArray())
         table.setDefaultEditor(AstartesCategory::class.java, categoryEditor)

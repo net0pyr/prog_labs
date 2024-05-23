@@ -1,19 +1,12 @@
 package com.net0pyr.gui
 
 import com.net0pyr.Client
-import com.net0pyr.army.Chapter
 import com.net0pyr.entity.SpaceMarine
 import com.net0pyr.enums.AstartesCategory
 import com.net0pyr.enums.MeleeWeapon
-import com.net0pyr.gui.UserApplication.Companion.table
-import com.net0pyr.location.Coordinates
 import java.util.*
-import javax.swing.DefaultCellEditor
-import javax.swing.JComboBox
-import javax.swing.JTextField
-import javax.swing.table.DefaultTableCellRenderer
+import javax.swing.JOptionPane
 import javax.swing.table.DefaultTableModel
-import javax.swing.table.TableCellRenderer
 
 class SpaceMarinesTable(locale: Locale = Locale.getDefault()) : DefaultTableModel() {
     private val columnNames: Array<String>
@@ -28,6 +21,7 @@ class SpaceMarinesTable(locale: Locale = Locale.getDefault()) : DefaultTableMode
         columnNames.forEach { addColumn(it) }
         data.forEach { addRow(toRow(it)) }
     }
+
     fun toRow(spaceMarine: SpaceMarine): Vector<Any> = Vector(
         arrayOf(
             spaceMarine.id, spaceMarine.name, spaceMarine.coordinates!!.x, spaceMarine.coordinates!!.y,
@@ -47,15 +41,80 @@ class SpaceMarinesTable(locale: Locale = Locale.getDefault()) : DefaultTableMode
 
         when (column) {
             1 -> spaceMarine.name = (aValue as? String) ?: ""
-            2 -> spaceMarine.coordinates?.x = (aValue as? String)?.toFloatOrNull() ?: 0f
-            3 -> spaceMarine.coordinates?.y = (aValue as? String)?.toDoubleOrNull() ?: 0.0
-            4 -> spaceMarine.health = (aValue as? String)?.toDoubleOrNull() ?: 0.0
-            5 -> spaceMarine.height = (aValue as? String)?.toIntOrNull() ?: 0
+            2 -> {
+                val xValue = (aValue as? String)?.toFloatOrNull()
+                if (xValue != null) {
+                    spaceMarine.coordinates?.x = xValue
+                } else {
+                    JOptionPane.showMessageDialog(
+                        null,
+                        UserApplication.resourceBundle.getString("invalidFormat"),
+                        UserApplication.resourceBundle.getString("error"),
+                        JOptionPane.ERROR_MESSAGE
+                    )
+                }
+            }
+
+            3 -> {
+                val yValue = (aValue as? String)?.toDoubleOrNull()
+                if (yValue != null) {
+                    spaceMarine.coordinates?.y = yValue
+                } else {
+                    JOptionPane.showMessageDialog(
+                        null,
+                        UserApplication.resourceBundle.getString("invalidFormat"),
+                        UserApplication.resourceBundle.getString("error"),
+                        JOptionPane.ERROR_MESSAGE
+                    )
+                }
+            }
+
+            4 -> {
+                val healthValue = (aValue as? String)?.toDoubleOrNull()
+                if (healthValue != null) {
+                    spaceMarine.health = healthValue
+                } else {
+                    JOptionPane.showMessageDialog(
+                        null,
+                        UserApplication.resourceBundle.getString("invalidFormat"),
+                        UserApplication.resourceBundle.getString("error"),
+                        JOptionPane.ERROR_MESSAGE
+                    )
+                }
+            }
+
+            5 -> {
+                val heightValue = (aValue as? String)?.toIntOrNull()
+                if (heightValue != null) {
+                    spaceMarine.height = heightValue
+                } else {
+                    JOptionPane.showMessageDialog(
+                        null,
+                        UserApplication.resourceBundle.getString("invalidFormat"),
+                        UserApplication.resourceBundle.getString("error"),
+                        JOptionPane.ERROR_MESSAGE
+                    )
+                }
+            }
+
             6 -> spaceMarine.category = (aValue as? AstartesCategory) ?: AstartesCategory.SCOUT
             7 -> spaceMarine.meleeWeapon = (aValue as? MeleeWeapon) ?: MeleeWeapon.CHAIN_SWORD
             8 -> spaceMarine.chapter?.name = (aValue as? String) ?: ""
             9 -> spaceMarine.chapter?.parentLegion = (aValue as? String) ?: ""
-            10 -> spaceMarine.chapter?.marineCount = (aValue as? String)?.toIntOrNull() ?: 0
+            10 -> {
+                val marineCountValue = (aValue as? String)?.toIntOrNull()
+                if (marineCountValue != null) {
+                    spaceMarine.chapter?.marineCount = marineCountValue
+                } else {
+                    JOptionPane.showMessageDialog(
+                        null,
+                        UserApplication.resourceBundle.getString("invalidFormat"),
+                        UserApplication.resourceBundle.getString("error"),
+                        JOptionPane.ERROR_MESSAGE
+                    )
+                }
+            }
+
             11 -> spaceMarine.chapter?.world = (aValue as? String) ?: ""
         }
 

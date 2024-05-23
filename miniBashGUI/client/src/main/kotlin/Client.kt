@@ -3,6 +3,7 @@ package com.net0pyr
 import com.net0pyr.WorkingWithCommand.CommandHandler
 import com.net0pyr.entity.Command
 import com.net0pyr.gui.Login
+import com.net0pyr.gui.NumericCellEditor
 import com.net0pyr.gui.SpaceMarinesTable
 import com.net0pyr.gui.UserApplication
 import kotlinx.serialization.decodeFromString
