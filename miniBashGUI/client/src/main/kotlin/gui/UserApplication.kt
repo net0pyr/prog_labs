@@ -70,7 +70,14 @@ class UserApplication : JFrame() {
                     tableModel.refreshTable() // Обновляем таблицу после команды "show"
                 }
             })
-            add(JButton("Command 3").apply { addActionListener { executeCommand("Command 3") } })
+            add(JButton(resourceBundle.getString("removeById")).apply {
+                addActionListener {
+                    val id = JOptionPane.showInputDialog(this@UserApplication, "Enter ID to delete:")
+                    if (id != null) {
+                        deleteById(id.toIntOrNull())
+                    }
+                }
+            })
             add(JButton("Command 4").apply { addActionListener { executeCommand("Command 4") } })
             add(JButton("Command 5").apply { addActionListener { executeCommand("Command 5") } })
         }
@@ -155,6 +162,21 @@ class UserApplication : JFrame() {
         }
 
         sorter.rowFilter = if (filters.isEmpty()) null else RowFilter.andFilter(filters)
+    }
+
+    private fun deleteById(id: Int?) {
+        if (id == null) {
+            JOptionPane.showMessageDialog(this, resourceBundle.getString("invalidFormat"), resourceBundle.getString("error"), JOptionPane.ERROR_MESSAGE)
+            return
+        }
+        val rowIndex = SpaceMarinesTable.data.indexOfFirst { it.id.toInt() == id }
+        if (rowIndex >= 0) {
+            tableModel.removeObject(rowIndex)
+            Client.command.commandArgument = id.toString()
+            Client.command.name = "remove_by_id"
+        } else {
+            JOptionPane.showMessageDialog(this, resourceBundle.getString("removeException"),  resourceBundle.getString("error"), JOptionPane.ERROR_MESSAGE)
+        }
     }
 
     private fun executeCommand(command: String) {
@@ -251,7 +273,7 @@ class UserApplication : JFrame() {
                     weapon,
                     Chapter(chapterNameR, parentLegionR, marinesCountR, worldR)
                 )
-            } catch (e: NumberFormatException) {
+            } catch (e: Exception) {
                 JOptionPane.showMessageDialog(this, (resourceBundle.getString("addException")))
             }
         }

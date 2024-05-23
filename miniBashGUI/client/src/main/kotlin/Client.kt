@@ -133,9 +133,6 @@ class Client {
                 UserApplication.visualizationPanel.repaint()
                 command.name = "no"
             } else if(String(data) != "null") {
-                if (command.name == "add" && String(data) != "null") {
-                    UserApplication.tableModel.addObject(Json.decodeFromString(String(data).split("\n")[0]))
-                }
                 command.name = "show"
                 command.spaceMarine = null
                 command.chapter = null
