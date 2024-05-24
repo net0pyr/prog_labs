@@ -31,20 +31,6 @@ class Server {
         serverChannel.configureBlocking(false)
         serverChannel.register(selector, SelectionKey.OP_ACCEPT)
         logger?.info("Сервер начал работу")
-//        Thread {
-//            BufferedReader(InputStreamReader(System.`in`)).use { reader ->
-//                while (true) {
-//                    if (reader.ready()) {
-//                        val line = reader.readLine()
-//                        if (line == "save") {
-//                            val save = Save()
-//                            save.commandExecution(null)
-//                        }
-//                    }
-//                }
-//            }
-//        }.start()
-
 
         while (true) {
 
@@ -94,7 +80,7 @@ class Server {
                         val password = inputString.split(":")[2]
                         val id = dataBase.login(login, password)
                         outputString = if (id != -1) {
-                            "Вход успешно выполнен:${id}"
+                            "Вход успешно выполнен:${id}:${login}"
                         } else {
                             "Неверный логин или пароль"
                         }
@@ -110,7 +96,7 @@ class Server {
                             "Аккаунт с таким логином уже существует"
                         }else {
                             History.history[id] = mutableListOf<String>()
-                            "Аккаунт успешно добавлен. Можете воспользоваться командой help, чтобы ознакомиться с командами.:${id}"
+                            "Аккаунт успешно добавлен. Можете воспользоваться командой help, чтобы ознакомиться с командами.:${id}:${login}"
                         }
                     }
 

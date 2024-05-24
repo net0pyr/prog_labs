@@ -32,6 +32,7 @@ class Client {
         var command = Command("no")
         var id = -1
         val selector: Selector = Selector.open()
+        var login = ""
     }
     fun start(scanner: Scanner) {
         val clientChannel = SocketChannel.open()
@@ -107,10 +108,12 @@ class Client {
             ) {
                 isLogin = true
                 id = String(data).split(":")[1].toInt()
+                login = String(data).split(":")[2]
                 Login.frame.dispose()
                 SwingUtilities.invokeLater {
                     UserApplication().isVisible = true
                 }
+                UserApplication.visualizationPanel.startStopAnimation()
             } else if (message == "Неверный логин или пароль" ||
                 message == "Ошибка создания аккаунта" ||
                 message == "Аккаунт с таким логином уже существует"
@@ -131,6 +134,7 @@ class Client {
                 UserApplication.tableModel.refreshTable()
                 UserApplication.visualizationPanel.revalidate()
                 UserApplication.visualizationPanel.repaint()
+                UserApplication.infoPanel.updateControlPanel()
                 command.name = "no"
             } else if(String(data) != "null") {
                 command.name = "show"

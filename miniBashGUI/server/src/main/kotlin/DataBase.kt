@@ -104,6 +104,25 @@ class DataBase {
         return id
     }
 
+    fun getLogin(id: Int): String {
+        val query = "SELECT login FROM account WHERE id = ?"
+
+        val preparedStatement: PreparedStatement = connection.prepareStatement(query)
+        preparedStatement.setInt(1, id)
+
+        val resultSet: ResultSet = preparedStatement.executeQuery()
+
+        if (resultSet.next()) {
+            return resultSet.getString("login")
+        }
+
+        resultSet.close()
+        preparedStatement.close()
+        //connection.close()
+
+        return "noLogin"
+    }
+
 //    fun addInHistory(command:String, id: Int) {
 //        val query = "INSERT INTO history (command, creator) VALUES (?, ?)"
 //        val preparedStatement: PreparedStatement = connection.prepareStatement(query, Statement.RETURN_GENERATED_KEYS)

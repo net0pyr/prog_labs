@@ -7,10 +7,14 @@ import java.awt.event.MouseAdapter
 import java.awt.event.MouseEvent
 import javax.swing.JOptionPane
 import javax.swing.JPanel
+import javax.swing.Timer
 
 class VisualizationPanel(private val objects: List<SpaceMarine>) : JPanel() {
     private var selectedObject: SpaceMarine? = null
-
+    private var animationTimer: Timer? = null
+    private var startTime: Long = 0
+    private var animationDuration: Long = 5000 // 5 seconds
+    private var animationStep = 0
 
     init {
         preferredSize = Dimension(400, 400)
@@ -40,12 +44,47 @@ class VisualizationPanel(private val objects: List<SpaceMarine>) : JPanel() {
     override fun paintComponent(g: Graphics) {
         super.paintComponent(g)
         objects.forEach {
-            g.color = if (it.creator == Client.id) Color.BLUE else Color.RED
-            g.fillRect(it.coordinates!!.x!!.toInt(),
-                it.coordinates!!.y!!.toInt(),
-                it.health!!.toInt(),
-                it.health!!.toInt()
-            )
+            if (animationTimer != null && animationTimer!!.isRunning) {
+                val elapsedTime = System.currentTimeMillis() - startTime
+                val progress = elapsedTime.toDouble() / animationDuration
+                val alpha = (Math.sin(progress * Math.PI) / 2.0 + 0.5).toFloat() // Smooth fade
+                g.color = Color(
+                    (255 * alpha).toInt(),
+                    (255 * alpha).toInt(),
+                    (255 * alpha).toInt()
+                )
+                g.fillRect(
+                    it.coordinates!!.x!!.toInt(),
+                    it.coordinates!!.y!!.toInt(),
+                    it.health!!.toInt(),
+                    it.health!!.toInt()
+                )
+            } else {
+                g.color = if (it.creator == Client.id) Color.BLUE else Color.RED
+                g.fillRect(
+                    it.coordinates!!.x!!.toInt(),
+                    it.coordinates!!.y!!.toInt(),
+                    it.health!!.toInt(),
+                    it.health!!.toInt()
+                )
+            }
+        }
+    }
+
+    fun startStopAnimation() {
+        if (animationTimer == null || !animationTimer!!.isRunning) {
+            animationTimer = Timer(1, null) // 25 frames per second
+            startTime = System.currentTimeMillis()
+            animationTimer!!.addActionListener {
+                val elapsedTime = System.currentTimeMillis() - startTime
+                if (elapsedTime >= animationDuration) {
+                    animationTimer!!.stop()
+                }
+                repaint()
+            }
+            animationTimer!!.start()
+        } else {
+            animationTimer!!.stop()
         }
     }
 }

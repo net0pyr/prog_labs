@@ -22,10 +22,11 @@ class UserApplication : JFrame() {
         var table: JTable = JTable(tableModel)
         var visualizationPanel: VisualizationPanel = VisualizationPanel(SpaceMarinesTable.data)
         val languageSwitcher = JComboBox(arrayOf("English", "Русский"))
-        var resourceBundle = ResourceBundle.getBundle("messages", Locale("en"))
+        var resourceBundle = ResourceBundle.getBundle("messages", Locale.getDefault())
+        var infoPanel = InfoPanel()
+        var sorter = TableRowSorter(tableModel)
     }
 
-    private val sorter = TableRowSorter(tableModel)
     private val filterPanel = JPanel(GridLayout(1, tableModel.columnCount)).apply {
         preferredSize = Dimension(preferredSize.width, 20)
     }
@@ -34,21 +35,19 @@ class UserApplication : JFrame() {
         defaultCloseOperation = EXIT_ON_CLOSE
         size = Dimension(1000, 800)
         layout = BorderLayout()
-        // Панель информации
-        // Создаем панель для размещения элементов управления
-        val controlPanel = JPanel().apply {
+        infoPanel.controlPanel.apply {
             layout = BoxLayout(this, BoxLayout.X_AXIS)
-            add(JLabel("User: current_user"))
+            add(JLabel("${resourceBundle.getString("user")}: ${Client.login}"))
             add(Box.createHorizontalStrut(10))
-            add(JLabel("Collection created: ${Date()}"))
+            add(JLabel("${resourceBundle.getString("collectionData")}: ${Date()}"))
             add(Box.createHorizontalStrut(10))
-            add(JLabel("Number of elements: ${SpaceMarinesTable.data.size}"))
+            add(JLabel("${resourceBundle.getString("count")}: ${SpaceMarinesTable.data.size}"))
             add(Box.createHorizontalGlue())
             add(languageSwitcher)
         }
 
         // Добавляем панель управления в верхнюю часть окна
-        add(controlPanel, BorderLayout.NORTH)
+        add(infoPanel.controlPanel, BorderLayout.NORTH)
 
 
         // Панель с кнопками
@@ -139,7 +138,9 @@ class UserApplication : JFrame() {
         val weaponEditor = MeleeWeaponCellEditor(MeleeWeapon.entries.toTypedArray())
         table.setDefaultEditor(MeleeWeapon::class.java, weaponEditor)
 
-        initLocalization(Locale("en"))
+        initLocalization(Locale.getDefault())
+
+        Client.selector.select(50)
 
         Client.command.name = "show"
     }
@@ -196,7 +197,7 @@ class UserApplication : JFrame() {
 
     private fun switchLanguage(language: String) {
         when (language) {
-            "English" -> initLocalization(Locale("en"))
+            "English" -> initLocalization(Locale.getDefault())
             "Русский" -> initLocalization(Locale("ru"))
         }
     }

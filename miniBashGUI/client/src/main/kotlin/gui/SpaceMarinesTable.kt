@@ -128,7 +128,7 @@ class SpaceMarinesTable(locale: Locale = Locale.getDefault()) : DefaultTableMode
         return when (columnIndex) {
             6 -> AstartesCategory::class.java
             7 -> MeleeWeapon::class.java
-            else -> super.getColumnClass(columnIndex)
+            else -> super.getColumnClass(columnIndex)::class.java
         }
     }
 
