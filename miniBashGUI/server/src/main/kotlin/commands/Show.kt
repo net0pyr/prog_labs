@@ -28,16 +28,20 @@ class Show : CommandExample() {
             "\u001B[31mКоманда show не имеет таких аргуметов.\u001B[0m\nВоспользуйтесь командой help, чтобы получить дополнительную информацию"
         } else {
             var outputString = ""
-            SpaceMarineInTreeSet.spaceMarines.asSequence().sortedBy { it.name }.forEach {
-                outputString+=Json.encodeToString(it)
+                SpaceMarineInTreeSet.spaceMarines.asSequence().sortedBy { it.name }.forEach {
+                    outputString += Json.encodeToString(it)
 //                if (spaceMarine != null) {
 //                    if(Server.dataBase.getCreatorSpaceMarine(spaceMarine.id)==id){
 //                        outputString.append(" - Ваш десантник")
 //                    }
 //                }
-                outputString+=("\n")
+                    outputString += ("\n")
+                }
+            if(outputString!="") {
+                outputString
+            } else {
+                "null"
             }
-            outputString
         }
     }
 }

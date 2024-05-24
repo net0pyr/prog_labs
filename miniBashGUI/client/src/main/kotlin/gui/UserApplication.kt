@@ -30,6 +30,7 @@ class UserApplication : JFrame() {
     private val filterPanel = JPanel(GridLayout(1, tableModel.columnCount)).apply {
         preferredSize = Dimension(preferredSize.width, 20)
     }
+
     init {
         title = "User Application"
         defaultCloseOperation = EXIT_ON_CLOSE
@@ -52,6 +53,7 @@ class UserApplication : JFrame() {
 
         // Панель с кнопками
         val buttonsPanel = JPanel().apply {
+            layout = GridLayout(3, 3)
             add(JButton(resourceBundle.getString("add")).apply {
                 addActionListener {
                     val spaceMarine = showAddDialog()
@@ -71,21 +73,71 @@ class UserApplication : JFrame() {
             })
             add(JButton(resourceBundle.getString("removeById")).apply {
                 addActionListener {
-                    val id = JOptionPane.showInputDialog(this@UserApplication, "Enter ID to delete:")
+                    val id =
+                        JOptionPane.showInputDialog(this@UserApplication, "${resourceBundle.getString("enter_id")}:")
                     if (id != null) {
                         deleteById(id.toIntOrNull())
                     }
                 }
             })
-            add(JButton("Command 4").apply { addActionListener { executeCommand("Command 4") } })
-            add(JButton("Command 5").apply { addActionListener { executeCommand("Command 5") } })
+            add(JButton(resourceBundle.getString("clear")).apply {
+                addActionListener {
+                    val confirmed = JOptionPane.showConfirmDialog(
+                        this@UserApplication,
+                        resourceBundle.getString("are_you_sure"),
+                        resourceBundle.getString("confirm"),
+                        JOptionPane.YES_NO_OPTION
+                    )
+                    if (confirmed == JOptionPane.YES_OPTION) {
+                        Client.command.name = "clear"
+                    }
+                }
+            })
+            add(JButton(resourceBundle.getString("add_if_max")).apply {
+                addActionListener {
+                    val spaceMarine = showAddDialog()
+                    if (spaceMarine != null) {
+                        spaceMarine.creator = Client.id
+                    }
+                    Client.command.spaceMarine = spaceMarine
+                    Client.command.name = "add_if_max"
+                }
+            })
+            add(JButton(resourceBundle.getString("remove_lower")).apply {
+                addActionListener {
+                    val spaceMarine = showAddDialog()
+                    if (spaceMarine != null) {
+                        spaceMarine.creator = Client.id
+                    }
+                    Client.command.spaceMarine = spaceMarine
+                    Client.command.name = "remove_lower"
+                }
+            })
+            add(JButton(resourceBundle.getString("count_less_than_chapter")).apply {
+                addActionListener {
+                    val chapter = showChapterDialog()
+                    if (chapter != null) {
+                        
+                    }
+                    Client.command.chapter = chapter
+                    Client.command.name = "count_less_than_chapter"
+                }
+            })
+            add(JButton(resourceBundle.getString("filter_contains_name")).apply { addActionListener { executeCommand("Command 5") } })
+            add(JButton(resourceBundle.getString("print_field_descending_melee_weapon")).apply {
+                addActionListener {
+                    executeCommand(
+                        "Command 5"
+                    )
+                }
+            })
         }
 
 
         val filters = mutableListOf<JComponent>()
 
         for (i in 0 until tableModel.columnCount) {
-            val filterComponent: JComponent = when(i) {
+            val filterComponent: JComponent = when (i) {
                 6 -> {
                     val categoriesWithEmpty = AstartesCategory.entries.map { it.toString() }.toMutableList()
                     categoriesWithEmpty.add(0, "nothing")
@@ -95,6 +147,7 @@ class UserApplication : JFrame() {
                     }
                     comboBox
                 }
+
                 7 -> {
                     val categoriesWithEmpty = MeleeWeapon.entries.map { it.toString() }.toMutableList()
                     categoriesWithEmpty.add(0, "nothing")
@@ -104,6 +157,7 @@ class UserApplication : JFrame() {
                     }
                     comboBox
                 }
+
                 else -> {
                     val textField = JTextField()
                     textField.addKeyListener(object : KeyAdapter() {
@@ -144,6 +198,7 @@ class UserApplication : JFrame() {
 
         Client.command.name = "show"
     }
+
     private fun applyFilters() {
         val filters = mutableListOf<RowFilter<Any, Any>>()
 
@@ -167,7 +222,12 @@ class UserApplication : JFrame() {
 
     private fun deleteById(id: Int?) {
         if (id == null) {
-            JOptionPane.showMessageDialog(this, resourceBundle.getString("invalidFormat"), resourceBundle.getString("error"), JOptionPane.ERROR_MESSAGE)
+            JOptionPane.showMessageDialog(
+                this,
+                resourceBundle.getString("invalidFormat"),
+                resourceBundle.getString("error"),
+                JOptionPane.ERROR_MESSAGE
+            )
             return
         }
         val rowIndex = SpaceMarinesTable.data.indexOfFirst { it.id.toInt() == id }
@@ -176,7 +236,12 @@ class UserApplication : JFrame() {
             Client.command.commandArgument = id.toString()
             Client.command.name = "remove_by_id"
         } else {
-            JOptionPane.showMessageDialog(this, resourceBundle.getString("removeException"),  resourceBundle.getString("error"), JOptionPane.ERROR_MESSAGE)
+            JOptionPane.showMessageDialog(
+                this,
+                resourceBundle.getString("removeException"),
+                resourceBundle.getString("error"),
+                JOptionPane.ERROR_MESSAGE
+            )
         }
     }
 
@@ -274,6 +339,47 @@ class UserApplication : JFrame() {
                     weapon,
                     Chapter(chapterNameR, parentLegionR, marinesCountR, worldR)
                 )
+            } catch (e: Exception) {
+                JOptionPane.showMessageDialog(this, (resourceBundle.getString("addException")))
+            }
+        }
+        return null
+    }
+
+    private fun showChapterDialog(): Chapter? {
+        val dialogPanel = JPanel(GridLayout(0, 2))
+
+        val chapterName = JTextField()
+        val parentLegion = JTextField()
+        val marinesCount = JTextField()
+        val world = JTextField()
+
+        dialogPanel.add(JLabel("${resourceBundle.getString("column_9")}:"))
+        dialogPanel.add(chapterName)
+        dialogPanel.add(JLabel("${resourceBundle.getString("column_10")}:"))
+        dialogPanel.add(parentLegion)
+        dialogPanel.add(JLabel("${resourceBundle.getString("column_11")}:"))
+        dialogPanel.add(marinesCount)
+        dialogPanel.add(JLabel("${resourceBundle.getString("column_12")}:"))
+        dialogPanel.add(world)
+
+        val result = JOptionPane.showConfirmDialog(
+            this,
+            dialogPanel,
+            resourceBundle.getString("add"),
+            JOptionPane.OK_CANCEL_OPTION,
+            JOptionPane.PLAIN_MESSAGE
+        )
+
+        if (result == JOptionPane.OK_OPTION) {
+            try {
+
+                val chapterNameR = chapterName.text
+                val parentLegionR = parentLegion.text
+                val marinesCountR = marinesCount.text.toInt()
+                val worldR = world.text
+
+                return Chapter(chapterNameR, parentLegionR, marinesCountR, worldR)
             } catch (e: Exception) {
                 JOptionPane.showMessageDialog(this, (resourceBundle.getString("addException")))
             }

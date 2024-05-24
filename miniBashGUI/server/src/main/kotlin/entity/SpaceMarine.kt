@@ -89,7 +89,7 @@ class SpaceMarine(
      * @param SpaceMarine объект с которым сравниваем
      */
     override fun compareTo(other: SpaceMarine): Int {
-        return this.id.compareTo(other.id)
+        return (this.health?.plus(this.height!!))?.compareTo((other.health?.plus(other.height!!)!!)) ?: 0
     }
 
     override fun toString(): String {

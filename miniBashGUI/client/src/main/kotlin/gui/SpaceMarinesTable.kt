@@ -118,17 +118,25 @@ class SpaceMarinesTable(locale: Locale = Locale.getDefault()) : DefaultTableMode
             11 -> spaceMarine.chapter?.world = (aValue as? String) ?: ""
         }
 
-
-        Client.command.spaceMarine = spaceMarine
-        Client.command.commandArgument = spaceMarine.id.toString()
-        Client.command.name = "update"
+        if (spaceMarine.creator != Client.id) {
+            JOptionPane.showMessageDialog(
+                null,
+                UserApplication.resourceBundle.getString("invalidOwner"),
+                UserApplication.resourceBundle.getString("error"),
+                JOptionPane.ERROR_MESSAGE
+            )
+        } else {
+            Client.command.spaceMarine = spaceMarine
+            Client.command.commandArgument = spaceMarine.id.toString()
+            Client.command.name = "update"
+        }
     }
 
     override fun getColumnClass(columnIndex: Int): Class<*> {
         return when (columnIndex) {
             6 -> AstartesCategory::class.java
             7 -> MeleeWeapon::class.java
-            else -> super.getColumnClass(columnIndex)::class.java
+            else -> Any::class.java
         }
     }
 

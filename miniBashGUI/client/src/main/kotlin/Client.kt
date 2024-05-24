@@ -123,14 +123,16 @@ class Client {
             }
             if(command.name == "show") {
                 SpaceMarinesTable.data.clear()
-                println(String(data).split("\n"))
-                String(data).split("\n").forEach {
-                    SpaceMarinesTable.data.add(Json.decodeFromString(it))
+                if(String(data)!="null") {
+                    println(String(data).split("\n"))
+                    String(data).split("\n").forEach {
+                        SpaceMarinesTable.data.add(Json.decodeFromString(it))
+                    }
                 }
                 //UserApplication.tableModel.refreshTable()
                 selector.select(50)
 //                UserApplication.tableModel.fireTableDataChanged() // Уведомление о изменениях данных в модели
-//                UserApplication.table.repaint()
+//                UserApplication.table.repaint() }
                 UserApplication.tableModel.refreshTable()
                 UserApplication.visualizationPanel.revalidate()
                 UserApplication.visualizationPanel.repaint()
