@@ -13,8 +13,7 @@ class VisualizationPanel(private val objects: List<SpaceMarine>) : JPanel() {
     private var selectedObject: SpaceMarine? = null
     private var animationTimer: Timer? = null
     private var startTime: Long = 0
-    private var animationDuration: Long = 5000 // 5 seconds
-    private var animationStep = 0
+    private var animationDuration: Long = 1000
 
     init {
         preferredSize = Dimension(400, 400)

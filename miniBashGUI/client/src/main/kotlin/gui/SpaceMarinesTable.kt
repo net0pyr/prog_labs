@@ -8,7 +8,7 @@ import java.util.*
 import javax.swing.JOptionPane
 import javax.swing.table.DefaultTableModel
 
-class SpaceMarinesTable(locale: Locale = Locale.getDefault()) : DefaultTableModel() {
+class SpaceMarinesTable(locale: Locale = Locale("en")) : DefaultTableModel() {
     private val columnNames: Array<String>
 
     companion object {

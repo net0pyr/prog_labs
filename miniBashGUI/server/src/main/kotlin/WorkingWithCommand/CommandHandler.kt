@@ -18,7 +18,7 @@ class CommandHandler {
         commands["add"] = Add()
         commands["add_if_max"] = Add_if_max()
         commands["clear"] = Clear()
-        commands["count_lass_than_chapter"] = Count_less_than_chapter()
+        commands["count_less_than_chapter"] = Count_less_than_chapter()
         commands["filter_contains_name"] = Filter_contains_name()
         commands["execute_script"] = Execute_script()
         commands["help"] = Help()

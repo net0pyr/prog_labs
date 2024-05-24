@@ -115,41 +115,53 @@ class Client {
                 }
                 UserApplication.visualizationPanel.startStopAnimation()
             } else if (message == "Неверный логин или пароль" ||
-                message == "Ошибка создания аккаунта" ||
-                message == "Аккаунт с таким логином уже существует"
+                message == "Ошибка создания аккаунта"
             ) {
-                JOptionPane.showMessageDialog(Login.frame, message, "Error", JOptionPane.ERROR_MESSAGE)
+                JOptionPane.showMessageDialog(Login.frame, UserApplication.resourceBundle.getString("enter_error"), "Error", JOptionPane.ERROR_MESSAGE)
+                Login.loginFlag = -1
+            } else if (message == "Аккаунт с таким логином уже существует") {
+                JOptionPane.showMessageDialog(Login.frame, UserApplication.resourceBundle.getString("create_account_error"), "Error", JOptionPane.ERROR_MESSAGE)
                 Login.loginFlag = -1
             }
-            if(command.name == "show") {
-                SpaceMarinesTable.data.clear()
-                if(String(data)!="null") {
-                    println(String(data).split("\n"))
-                    String(data).split("\n").forEach {
-                        SpaceMarinesTable.data.add(Json.decodeFromString(it))
+            if(isLogin) {
+                if (command.name == "show") {
+                    SpaceMarinesTable.data.clear()
+                    if (String(data) != "null") {
+                        println(String(data).split("\n"))
+                        String(data).split("\n").forEach {
+                            SpaceMarinesTable.data.add(Json.decodeFromString(it))
+                        }
                     }
-                }
-                //UserApplication.tableModel.refreshTable()
-                selector.select(50)
+                    //UserApplication.tableModel.refreshTable()
+                    selector.select(50)
 //                UserApplication.tableModel.fireTableDataChanged() // Уведомление о изменениях данных в модели
 //                UserApplication.table.repaint() }
-                UserApplication.tableModel.refreshTable()
-                UserApplication.visualizationPanel.revalidate()
-                UserApplication.visualizationPanel.repaint()
-                UserApplication.infoPanel.updateControlPanel()
-                command.name = "no"
-            } else if(String(data) != "null") {
-                command.name = "show"
-                command.spaceMarine = null
-                command.chapter = null
-                command.commandArgument = null
-                command.id = id
-            } else {
-                command.name = "no"
-                command.spaceMarine = null
-                command.chapter = null
-                command.commandArgument = null
-                command.id = id
+                    UserApplication.tableModel.refreshTable()
+                    UserApplication.visualizationPanel.revalidate()
+                    UserApplication.visualizationPanel.repaint()
+                    UserApplication.infoPanel.updateControlPanel()
+                    command.name = "no"
+                } else if (String(data) != "null") {
+                    if (command.name == "count_less_than_chapter") {
+                        JOptionPane.showMessageDialog(
+                            null,
+                            UserApplication.resourceBundle.getString("count") + ": " + String(data),
+                            "",
+                            JOptionPane.INFORMATION_MESSAGE
+                        )
+                    }
+                    command.name = "show"
+                    command.spaceMarine = null
+                    command.chapter = null
+                    command.commandArgument = null
+                    command.id = id
+                } else {
+                    command.name = "no"
+                    command.spaceMarine = null
+                    command.chapter = null
+                    command.commandArgument = null
+                    command.id = id
+                }
             }
             if (isConnected && CommandHandler.executeScriptFlag) {
                 readLine(clientChannel)

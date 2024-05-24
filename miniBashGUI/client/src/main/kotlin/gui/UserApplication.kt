@@ -11,6 +11,7 @@ import java.awt.Dimension
 import java.awt.GridLayout
 import java.awt.event.KeyAdapter
 import java.awt.event.KeyEvent
+import java.text.SimpleDateFormat
 import java.util.*
 import javax.swing.*
 import javax.swing.table.TableRowSorter
@@ -21,10 +22,11 @@ class UserApplication : JFrame() {
         var tableModel: SpaceMarinesTable = SpaceMarinesTable()
         var table: JTable = JTable(tableModel)
         var visualizationPanel: VisualizationPanel = VisualizationPanel(SpaceMarinesTable.data)
-        val languageSwitcher = JComboBox(arrayOf("English", "Русский"))
+        val languageSwitcher = JComboBox(arrayOf("English", "Русский", "Dansk", "Deutsch", "Español (Colombia)"))
         var resourceBundle = ResourceBundle.getBundle("messages", Locale.getDefault())
         var infoPanel = InfoPanel()
         var sorter = TableRowSorter(tableModel)
+        var buttonsPanel = JPanel()
     }
 
     private val filterPanel = JPanel(GridLayout(1, tableModel.columnCount)).apply {
@@ -40,20 +42,30 @@ class UserApplication : JFrame() {
             layout = BoxLayout(this, BoxLayout.X_AXIS)
             add(JLabel("${resourceBundle.getString("user")}: ${Client.login}"))
             add(Box.createHorizontalStrut(10))
-            add(JLabel("${resourceBundle.getString("collectionData")}: ${Date()}"))
+            add(
+                JLabel(
+                    "${resourceBundle.getString("collectionData")}: ${
+                        SimpleDateFormat.getDateInstance(
+                            SimpleDateFormat.LONG,
+                            Locale.getDefault()
+                        ).format(Date())
+                    }"
+                )
+            )
             add(Box.createHorizontalStrut(10))
             add(JLabel("${resourceBundle.getString("count")}: ${SpaceMarinesTable.data.size}"))
             add(Box.createHorizontalGlue())
             add(languageSwitcher)
         }
 
+
         // Добавляем панель управления в верхнюю часть окна
         add(infoPanel.controlPanel, BorderLayout.NORTH)
 
 
         // Панель с кнопками
-        val buttonsPanel = JPanel().apply {
-            layout = GridLayout(3, 3)
+        buttonsPanel.apply {
+            layout = GridLayout(7, 1)
             add(JButton(resourceBundle.getString("add")).apply {
                 addActionListener {
                     val spaceMarine = showAddDialog()
@@ -74,7 +86,10 @@ class UserApplication : JFrame() {
             add(JButton(resourceBundle.getString("removeById")).apply {
                 addActionListener {
                     val id =
-                        JOptionPane.showInputDialog(this@UserApplication, "${resourceBundle.getString("enter_id")}:")
+                        JOptionPane.showInputDialog(
+                            this@UserApplication,
+                            "${resourceBundle.getString("enter_id")}:"
+                        )
                     if (id != null) {
                         deleteById(id.toIntOrNull())
                     }
@@ -116,23 +131,11 @@ class UserApplication : JFrame() {
             add(JButton(resourceBundle.getString("count_less_than_chapter")).apply {
                 addActionListener {
                     val chapter = showChapterDialog()
-                    if (chapter != null) {
-                        
-                    }
                     Client.command.chapter = chapter
                     Client.command.name = "count_less_than_chapter"
                 }
             })
-            add(JButton(resourceBundle.getString("filter_contains_name")).apply { addActionListener { executeCommand("Command 5") } })
-            add(JButton(resourceBundle.getString("print_field_descending_melee_weapon")).apply {
-                addActionListener {
-                    executeCommand(
-                        "Command 5"
-                    )
-                }
-            })
         }
-
 
         val filters = mutableListOf<JComponent>()
 
@@ -192,7 +195,7 @@ class UserApplication : JFrame() {
         val weaponEditor = MeleeWeaponCellEditor(MeleeWeapon.entries.toTypedArray())
         table.setDefaultEditor(MeleeWeapon::class.java, weaponEditor)
 
-        initLocalization(Locale.getDefault())
+        initLocalization(Locale("en"))
 
         Client.selector.select(50)
 
@@ -245,10 +248,6 @@ class UserApplication : JFrame() {
         }
     }
 
-    private fun executeCommand(command: String) {
-        JOptionPane.showMessageDialog(this, "$command executed")
-    }
-
     private fun initLocalization(locale: Locale) {
         resourceBundle = ResourceBundle.getBundle("messages", locale)
 
@@ -257,13 +256,52 @@ class UserApplication : JFrame() {
             val columnName = resourceBundle.getString("column_${i + 1}")
             column.headerValue = columnName
         }
+        for (i in 0 until buttonsPanel.componentCount) {
+            val component = buttonsPanel.getComponent(i)
+            if (component is JButton) {
+                val buttonName = when (i) {
+                    0 -> resourceBundle.getString("add")
+                    1 -> resourceBundle.getString("refresh")
+                    2 -> resourceBundle.getString("removeById")
+                    3 -> resourceBundle.getString("clear")
+                    4 -> resourceBundle.getString("add_if_max")
+                    5 -> resourceBundle.getString("remove_lower")
+                    6 -> resourceBundle.getString("count_less_than_chapter")
+                    else -> ""
+                }
+                component.text = buttonName
+            }
+        }
+
+        for (i in 0 until infoPanel.controlPanel.componentCount) {
+            val component = infoPanel.controlPanel.getComponent(i)
+            if (component is JLabel) {
+                when (i) {
+                    0 -> component.text = "${resourceBundle.getString("user")}: ${Client.login}"
+                    2 -> component.text = "${resourceBundle.getString("collectionData")}: ${
+                        SimpleDateFormat.getDateInstance(
+                            SimpleDateFormat.LONG,
+                            locale
+                        ).format(Date())
+                    }"
+
+                    4 -> component.text = "${resourceBundle.getString("count")}: ${SpaceMarinesTable.data.size}"
+                }
+            }
+        }
+
         table.tableHeader.repaint()
+        infoPanel.controlPanel.repaint()
+        buttonsPanel.repaint()
     }
 
     private fun switchLanguage(language: String) {
         when (language) {
-            "English" -> initLocalization(Locale.getDefault())
-            "Русский" -> initLocalization(Locale("ru"))
+            "English" -> initLocalization(Locale("en"))
+            "Русский" -> initLocalization(Locale.getDefault())
+            "Deutsch" -> initLocalization(Locale("ge"))
+            "Dansk" -> initLocalization(Locale("da"))
+            "Español (Colombia)" -> initLocalization(Locale("is","CO"))
         }
     }
 
