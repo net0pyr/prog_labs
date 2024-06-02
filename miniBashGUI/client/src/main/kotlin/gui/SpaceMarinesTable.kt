@@ -166,14 +166,15 @@ class SpaceMarinesTable(locale: Locale = Locale("en")) : DefaultTableModel() {
     }
 
     fun refreshTable() {
-        // Удаляем все строки из таблицы
+        try {
         rowCount = 0
 
-        // Добавляем строки с обновленными данными
         data.forEach { addRow(toRow(it)) }
 
-        // Уведомляем о структурных изменениях в таблице
         fireTableStructureChanged()
         fireTableDataChanged()
+        } catch (_: ArrayIndexOutOfBoundsException) {
+
+        }
     }
 }

@@ -5,6 +5,7 @@ import com.net0pyr.enums.*
 import com.net0pyr.location.*
 import com.net0pyr.army.*
 import com.net0pyr.exceptions.MyIllegalArgumentException
+import com.net0pyr.gui.UserApplication
 import kotlinx.serialization.Serializable
 import kotlin.math.abs
 
@@ -99,7 +100,7 @@ class SpaceMarine(
     }
 
     override fun toString(): String {
-        return "Имя - $name, id - $id"
+        return "${UserApplication.resourceBundle.getString("column_2")} - $name, id - $id"
     }
 
     override fun equals(other: Any?): Boolean {

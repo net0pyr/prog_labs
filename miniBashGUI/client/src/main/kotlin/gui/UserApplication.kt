@@ -59,11 +59,11 @@ class UserApplication : JFrame() {
         }
 
 
-        // Добавляем панель управления в верхнюю часть окна
+
         add(infoPanel.controlPanel, BorderLayout.NORTH)
 
 
-        // Панель с кнопками
+
         buttonsPanel.apply {
             layout = GridLayout(7, 1)
             add(JButton(resourceBundle.getString("add")).apply {
@@ -71,7 +71,7 @@ class UserApplication : JFrame() {
                     val spaceMarine = showAddDialog()
                     if (spaceMarine != null) {
                         spaceMarine.creator = Client.id
-                        tableModel.addObject(spaceMarine) // Добавляем объект в модель таблицы
+                        tableModel.addObject(spaceMarine)
                     }
                     Client.command.spaceMarine = spaceMarine
                     Client.command.name = "add"
@@ -80,7 +80,7 @@ class UserApplication : JFrame() {
             add(JButton(resourceBundle.getString("refresh")).apply {
                 addActionListener {
                     Client.command.name = "show"
-                    tableModel.refreshTable() // Обновляем таблицу после команды "show"
+                    tableModel.refreshTable()
                 }
             })
             add(JButton(resourceBundle.getString("removeById")).apply {
@@ -185,7 +185,6 @@ class UserApplication : JFrame() {
         add(visualizationPanel, BorderLayout.EAST)
         add(buttonsPanel, BorderLayout.SOUTH)
 
-        // Настраиваем переключатель языка
         languageSwitcher.addActionListener { switchLanguage(languageSwitcher.selectedItem as String) }
 
         table.rowSorter = sorter

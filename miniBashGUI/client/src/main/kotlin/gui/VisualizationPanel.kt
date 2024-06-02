@@ -9,21 +9,21 @@ import javax.swing.JOptionPane
 import javax.swing.JPanel
 import javax.swing.Timer
 
-class VisualizationPanel(private val objects: List<SpaceMarine>) : JPanel() {
+class VisualizationPanel(private val spaceMarines: List<SpaceMarine>) : JPanel() {
     private var selectedObject: SpaceMarine? = null
     private var animationTimer: Timer? = null
     private var startTime: Long = 0
     private var animationDuration: Long = 1000
 
     init {
-        preferredSize = Dimension(400, 400)
+        preferredSize = Dimension(400, 1000)
         background = Color.WHITE
         addMouseListener(object : MouseAdapter() {
             override fun mouseClicked(e: MouseEvent) {
-                objects.forEach {
+                spaceMarines.forEach {
                     if (isPointInsideObject(e.point, it)) {
                         selectedObject = it
-                        JOptionPane.showMessageDialog(this@VisualizationPanel, "Selected Object: $it")
+                        JOptionPane.showMessageDialog(this@VisualizationPanel, "${UserApplication.resourceBundle.getString("Selected_Object")}: $it")
                     }
                 }
             }
@@ -42,11 +42,11 @@ class VisualizationPanel(private val objects: List<SpaceMarine>) : JPanel() {
 
     override fun paintComponent(g: Graphics) {
         super.paintComponent(g)
-        objects.forEach {
+        spaceMarines.forEach {
             if (animationTimer != null && animationTimer!!.isRunning) {
                 val elapsedTime = System.currentTimeMillis() - startTime
                 val progress = elapsedTime.toDouble() / animationDuration
-                val alpha = (Math.sin(progress * Math.PI) / 2.0 + 0.5).toFloat() // Smooth fade
+                val alpha = (Math.sin(progress * Math.PI) / 2.0 + 0.5).toFloat()
                 g.color = Color(
                     (255 * alpha).toInt(),
                     (255 * alpha).toInt(),
@@ -72,7 +72,7 @@ class VisualizationPanel(private val objects: List<SpaceMarine>) : JPanel() {
 
     fun startStopAnimation() {
         if (animationTimer == null || !animationTimer!!.isRunning) {
-            animationTimer = Timer(1, null) // 25 frames per second
+            animationTimer = Timer(1, null)
             startTime = System.currentTimeMillis()
             animationTimer!!.addActionListener {
                 val elapsedTime = System.currentTimeMillis() - startTime

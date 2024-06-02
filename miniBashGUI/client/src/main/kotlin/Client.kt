@@ -3,10 +3,8 @@ package com.net0pyr
 import com.net0pyr.WorkingWithCommand.CommandHandler
 import com.net0pyr.entity.Command
 import com.net0pyr.gui.Login
-import com.net0pyr.gui.NumericCellEditor
 import com.net0pyr.gui.SpaceMarinesTable
 import com.net0pyr.gui.UserApplication
-import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import java.net.ConnectException
@@ -113,7 +111,6 @@ class Client {
                 SwingUtilities.invokeLater {
                     UserApplication().isVisible = true
                 }
-                UserApplication.visualizationPanel.startStopAnimation()
             } else if (message == "Неверный логин или пароль" ||
                 message == "Ошибка создания аккаунта"
             ) {
@@ -141,6 +138,7 @@ class Client {
                     UserApplication.visualizationPanel.repaint()
                     UserApplication.infoPanel.updateControlPanel()
                     command.name = "no"
+                    UserApplication.visualizationPanel.startStopAnimation()
                 } else if (String(data) != "null") {
                     if (command.name == "count_less_than_chapter") {
                         JOptionPane.showMessageDialog(
